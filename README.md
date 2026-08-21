@@ -1,7 +1,5 @@
 # 🩸 LifeLine — Real-Time Blood Bank Demand Matching
 
-> **Omni_BioTech_15** | OMNIKON Hackathon | Team **Diva** — Aditi Sharma (Solo)
-
 LifeLine is a real-time matching platform that connects **blood donors**, **blood banks**, and **hospitals** on one shared system — replacing manual phone-tree coordination with a live, queryable graph and a weighted matching algorithm.
 
 ---
@@ -115,15 +113,7 @@ Score = 0.35 × Urgency + 0.30 × Proximity + 0.20 × Expiry + 0.15 × Reliabili
 - Scope is intentionally solo-achievable in 4 weeks — the matching engine, the core differentiator, is self-contained and testable independently of the UI.
 - Key risks (concurrent claims, low-density areas, unreliable donors) are handled by first-confirmed-locks logic, auto-escalation to district-level networks, and reliability scoring respectively.
 
----
 
-## 👤 Team
-
-**Team Name:** Diva
-**Member:** Aditi Sharma (Solo)
-**Theme:** BioTech & HealthTech
-
----
 
 <p align="center"><b>One mission. Build the impossible.</b></p>
 
