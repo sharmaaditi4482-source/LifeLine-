@@ -21,15 +21,15 @@ export default function HeroSection({ handleSmoothScroll }: HeroSectionProps) {
         </div>
 
         <h1 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl md:text-[56px] leading-[1.08] max-w-2xl">
-          Compatible blood exists.
+          Compatible blood exist.
           <br />
           <span className="text-blood font-normal italic">
-            The problem is finding it in time.
+            Right on time
           </span>
         </h1>
 
         <p className="max-w-xl text-base text-ink-60 leading-relaxed sm:text-lg">
-          LifeLine connects hospitals, donors, and blood banks through a live matching engine that finds the right blood source when every minute matters.
+          LifeLine connects hospitals, donors, and blood banks through live tracking when every second matters.
         </p>
 
         <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -38,12 +38,6 @@ export default function HeroSection({ handleSmoothScroll }: HeroSectionProps) {
             className="rounded-xl bg-blood border border-blood px-6 py-3.5 font-display text-sm font-semibold text-white transition-all hover:bg-blood-light hover:shadow-sm"
           >
             Request Blood
-          </Link>
-          <Link
-            href="/donor"
-            className="rounded-xl border border-ink-10 bg-white px-6 py-3.5 font-display text-sm font-semibold text-ink transition-all hover:border-ink"
-          >
-            Find a Donor
           </Link>
           <a
             href="#how-it-works"

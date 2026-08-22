@@ -26,13 +26,13 @@ export default function HowItWorks({ handleSmoothScroll }: HowItWorksProps) {
             step: "01",
             label: "REQUEST",
             title: "Submit Demand",
-            desc: "Hospital submits required blood group, urgency level, precise GPS location, and targeted units.",
+            desc: "Hospital Submits: Required Blood Group, Urgency Level, Precise GPS Location, Targeted Units.",
           },
           {
             step: "02",
             label: "MATCH",
             title: "Scored Sorting",
-            desc: "LifeLine filters incompatibility out, then calculates proximity, urgency, stock expiry, and donor reliability.",
+            desc: "LifeLine filters incompatibility out, by calculating Proximity, Urgency, Stock Expiry, and Donor Reliability.",
           },
           {
             step: "03",
