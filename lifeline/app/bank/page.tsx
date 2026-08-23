@@ -31,15 +31,63 @@ export default function BankPage() {
   const [loading, setLoading] = useState(true);
   const [filterGroup, setFilterGroup] = useState<BloodGroup | "ALL">("ALL");
 
-  useEffect(() => {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [bankNameInput, setBankNameInput] = useState("Apollo Hospital Blood Bank");
+  const [bloodGroupInput, setBloodGroupInput] = useState<BloodGroup>("O+");
+  const [unitsInput, setUnitsInput] = useState(5);
+  const [expiryDaysInput, setExpiryDaysInput] = useState(25);
+  const [locationLabelInput, setLocationLabelInput] = useState("South Extension, Delhi");
+  const [addLoading, setAddLoading] = useState(false);
+  const [addSuccess, setAddSuccess] = useState(false);
+
+  const fetchUnits = () => {
+    setLoading(true);
     fetch("/api/banks")
       .then((r) => r.json())
       .then((d) => {
-        setUnits(d.bankUnits);
+        setUnits(d?.bankUnits || []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchUnits();
   }, []);
+
+  async function handleAddStock(e: React.FormEvent) {
+    e.preventDefault();
+    setAddLoading(true);
+    try {
+      const res = await fetch("/api/banks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bankName: bankNameInput,
+          bloodGroup: bloodGroupInput,
+          unitsAvailable: unitsInput,
+          expiryDays: expiryDaysInput,
+          location: {
+            lat: 28.5600,
+            lng: 77.2200,
+            label: locationLabelInput,
+          },
+        }),
+      });
+      if (res.ok) {
+        setAddSuccess(true);
+        fetchUnits();
+        setTimeout(() => {
+          setShowAddModal(false);
+          setAddSuccess(false);
+        }, 1500);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setAddLoading(false);
+    }
+  }
 
   const filteredUnits = useMemo(() => {
     if (filterGroup === "ALL") return units;
@@ -70,6 +118,127 @@ export default function BankPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14 page-enter">
+      {/* Add Stock Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md card-2xl bg-clay p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-blood">
+                  Bank Command
+                </p>
+                <h2 className="mt-1 font-display text-xl font-semibold text-ink">
+                  Register Blood Stock
+                </h2>
+              </div>
+              <button
+                onClick={() => { setShowAddModal(false); setAddSuccess(false); }}
+                className="font-mono text-sm text-ink-40 hover:text-ink transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {addSuccess ? (
+              <div className="text-center py-6 space-y-3 animate-fade-in">
+                <div className="h-12 w-12 rounded-full bg-green-100 border border-green-200 flex items-center justify-center mx-auto font-bold text-green-700 text-lg">
+                  ✓
+                </div>
+                <p className="font-display text-lg font-semibold text-ink">
+                  Blood units registered in live inventory!
+                </p>
+                <p className="text-sm text-ink-60">
+                  The matching engine will now route hospital emergencies to your bank.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleAddStock} className="space-y-4">
+                <div>
+                  <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                    Blood Bank / Hospital Center Name
+                  </label>
+                  <input
+                    required
+                    value={bankNameInput}
+                    onChange={(e) => setBankNameInput(e.target.value)}
+                    className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                      Blood Group
+                    </label>
+                    <select
+                      value={bloodGroupInput}
+                      onChange={(e) => setBloodGroupInput(e.target.value as BloodGroup)}
+                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
+                    >
+                      {BLOOD_GROUPS.map((bg) => (
+                        <option key={bg} value={bg}>{bg}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                      Units Available
+                    </label>
+                    <input
+                      required
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={unitsInput}
+                      onChange={(e) => setUnitsInput(Number(e.target.value))}
+                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                      Days to Expiry
+                    </label>
+                    <input
+                      required
+                      type="number"
+                      min={1}
+                      max={45}
+                      value={expiryDaysInput}
+                      onChange={(e) => setExpiryDaysInput(Number(e.target.value))}
+                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                      City / Area
+                    </label>
+                    <input
+                      required
+                      value={locationLabelInput}
+                      onChange={(e) => setLocationLabelInput(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={addLoading}
+                  className="w-full rounded-xl bg-blood px-6 py-3 font-display text-sm font-semibold text-white transition hover:bg-blood-light disabled:opacity-50 mt-2"
+                >
+                  {addLoading ? "Saving to Inventory..." : "+ Add to Live Stock"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center w-full">
         <Link
           href="/"
@@ -77,13 +246,22 @@ export default function BankPage() {
         >
           ← Back
         </Link>
-        <button
-          onClick={handleLogout}
-          type="button"
-          className="font-mono text-xs uppercase tracking-widest text-blood hover:underline font-semibold"
-        >
-          Logout ✕
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowAddModal(true)}
+            type="button"
+            className="rounded-xl border border-blood bg-blood px-3.5 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition-all hover:bg-blood-light shadow-sm"
+          >
+            + Add Blood Stock
+          </button>
+          <button
+            onClick={handleLogout}
+            type="button"
+            className="font-mono text-xs uppercase tracking-widest text-blood hover:underline font-semibold"
+          >
+            Logout ✕
+          </button>
+        </div>
       </div>
 
       <div className="mt-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">

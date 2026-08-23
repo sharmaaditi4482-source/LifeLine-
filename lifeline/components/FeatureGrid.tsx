@@ -2,36 +2,48 @@
 
 export default function FeatureGrid() {
   const features = [
-    { title: "Live Weighted Matching", desc: "Instantly computes candidate rank dynamically based on 4 scoring vectors." },
-    { title: "Hard ABO/Rh Safety Filter", desc: "Enforces strict genetic matching circuits before scoring algorithms run." },
-    { title: "Expiry-Aware Prioritization", desc: "Prioritizes units nearest to their expiration limits to reduce resource waste." },
-    { title: "Donor Turnout Scoring", desc: "Tracks historical donor attendance rates to calculate reliability coefficients." },
-    { title: "First-Confirmed Locking", desc: "Locks the first matching confirmation and automatically releases alternative reserves." },
-    { title: "Automated Escalation", desc: "Triggers district-level alerts automatically if local resources report no matches." },
-    { title: "Role-Based Dashboards", desc: "Individual secure portals customized for hospitals, donors, and bank units." },
-    { title: "Real-Time Push Alerts", desc: "Dispatches SMS and portal messages with coordinate maps to confirmed matches." },
+    { icon: "⚖️", title: "Live Weighted Matching", desc: "Instantly computes candidate rank dynamically based on 4 real-time scoring vectors." },
+    { icon: "🛡️", title: "Hard ABO/Rh Safety Filter", desc: "Enforces strict genetic matching circuits before any scoring algorithms run." },
+    { icon: "⏳", title: "Expiry-Aware Prioritization", desc: "Prioritizes units nearest to expiration limits (≤10 days) to prevent stock wastage." },
+    { icon: "📈", title: "Donor Turnout Scoring", desc: "Tracks historical donor attendance rates to calculate reliability coefficients." },
+    { icon: "🔒", title: "First-Confirmed Locking", desc: "Locks the first matching confirmation and automatically releases alternative reserves." },
+    { icon: "🚨", title: "Automated Escalation", desc: "Triggers district-level alerts automatically if local resources report no matches." },
+    { icon: "👥", title: "Role-Based Dashboards", desc: "Individual secure portals customized for hospitals, donors, and blood bank units." },
+    { icon: "📍", title: "GPS Radius GIS Mapping", desc: "Interactive Leaflet geospatial routing and real-time transit distance calculations." },
   ];
 
   return (
-    <section className="reveal-item space-y-12">
+    <section className="reveal-item space-y-10">
       <div className="text-center max-w-xl mx-auto space-y-3">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-blood">PRODUCT CAPABILITIES</p>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/60 border border-red-200">
+          <span className="h-1.5 w-1.5 rounded-full bg-blood" />
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
+            CLINICAL CAPABILITIES
+          </span>
+        </div>
         <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">
-          Verified clinical infrastructure.
+          Engineered for zero-failure dispatch.
         </h2>
-        <p className="text-sm text-ink-60 max-w-sm mx-auto">
-          Built for speed, safety, and coordinate alignment during critical dispatches.
+        <p className="text-xs sm:text-sm text-ink-60 max-w-md mx-auto leading-relaxed">
+          High-performance bio-logistics platform built for speed, safety, and coordinate alignment during critical dispatches.
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {features.map((f, i) => (
           <div
             key={i}
-            className="card border-ink-10 bg-white p-5 space-y-2.5 transition-all hover:border-blood/20 shadow-sm"
+            className="rounded-3xl border border-ink-10 bg-white p-5 space-y-3 transition-all hover:border-blood/30 hover:shadow-md shadow-sm group"
           >
-            <h4 className="font-display font-semibold text-sm text-ink">{f.title}</h4>
-            <p className="text-[11px] text-ink-60 leading-relaxed">{f.desc}</p>
+            <div className="w-10 h-10 rounded-2xl bg-[#FAF7F2] border border-ink-10 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              {f.icon}
+            </div>
+            <h4 className="font-display font-semibold text-sm text-ink group-hover:text-blood transition-colors">
+              {f.title}
+            </h4>
+            <p className="text-xs text-ink-60 leading-relaxed">
+              {f.desc}
+            </p>
           </div>
         ))}
       </div>

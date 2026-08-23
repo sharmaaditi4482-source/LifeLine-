@@ -66,11 +66,16 @@ export default function LoginPage() {
 
         if (error) throw error;
 
-        const userRole = data.user?.user_metadata?.role || "hospital";
-        setMessage("Login successful! Redirecting to dashboard...");
+        // Always respect the actively selected role tab
+        const targetRole = role || data.user?.user_metadata?.role || "hospital";
+        if (data.user) {
+          supabase.auth.updateUser({ data: { role: targetRole } }).catch(() => {});
+        }
+        localStorage.setItem("lifeline_selected_role", targetRole);
+        setMessage(`Login successful! Redirecting to ${targetRole} portal...`);
         setTimeout(() => {
-          router.push(`/${userRole}`);
-        }, 1000);
+          router.push(`/${targetRole}`);
+        }, 600);
       }
     } catch (err: any) {
       setErrorText(err.message || "Authentication failed. Please check credentials.");
@@ -83,6 +88,7 @@ export default function LoginPage() {
     setErrorText("");
     setMessage("");
     try {
+      localStorage.setItem("lifeline_selected_role", role);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

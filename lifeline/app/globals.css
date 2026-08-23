@@ -99,37 +99,100 @@ body {
   }
 }
 
-/* Breathing scale loop for center drop icon */
-@keyframes dropletBreathe {
-  0%, 100% {
-    transform: scale(1);
+/* Radar Sweep Animation */
+@keyframes radarSpin {
+  from {
+    transform: rotate(0deg);
   }
-  50% {
-    transform: scale(1.04);
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Light path signal pulse flow */
-@keyframes pathSignalFlow {
+/* Continuous laser signal travel */
+@keyframes laserDash {
   from {
-    stroke-dashoffset: 60;
+    stroke-dashoffset: 40;
   }
   to {
     stroke-dashoffset: 0;
   }
 }
 
-/* Ticker sweep-of-light effect */
-@keyframes shimmerSweep {
+/* Floating bobbing effect */
+@keyframes floatSway {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes floatSwayReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-3deg);
+  }
+}
+
+/* Concentric ring expansion */
+@keyframes ringExpand {
   0% {
-    left: -150%;
+    transform: scale(0.85);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
   }
   100% {
-    left: 150%;
+    transform: scale(0.85);
+    opacity: 0.8;
+  }
+}
+
+/* Ambient crimson breathing glow */
+@keyframes crimsonGlow {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.08);
   }
 }
 
 /* ── Animation utilities ── */
+
+.animate-radar-spin {
+  animation: radarSpin 8s linear infinite;
+  transform-origin: center;
+}
+
+.animate-laser-dash {
+  stroke-dasharray: 6 10;
+  animation: laserDash 1.2s linear infinite;
+}
+
+.animate-float-sway {
+  animation: floatSway 4s ease-in-out infinite;
+}
+
+.animate-float-sway-rev {
+  animation: floatSwayReverse 5s ease-in-out infinite;
+}
+
+.animate-ring-expand {
+  animation: ringExpand 3s ease-in-out infinite;
+}
+
+.animate-crimson-glow {
+  animation: crimsonGlow 4s ease-in-out infinite;
+}
 
 .animate-fade-slide-up {
   animation: fadeSlideUp 0.4s ease-out both;

@@ -46,17 +46,73 @@ export default function DonorPage() {
   const [regName, setRegName] = useState("");
   const [regPhone, setRegPhone] = useState("");
   const [regBloodGroup, setRegBloodGroup] = useState<BloodGroup>("O+");
-  const [regLocationIndex, setRegLocationIndex] = useState(0);
+  const [regAreaInput, setRegAreaInput] = useState("Saket, Delhi");
   const [regLoading, setRegLoading] = useState(false);
   const [regSuccess, setRegSuccess] = useState(false);
   const [regError, setRegError] = useState("");
+
+  const CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
+    "delhi": { lat: 28.6139, lng: 77.2090 },
+    "saket": { lat: 28.5244, lng: 77.2173 },
+    "lajpat": { lat: 28.5677, lng: 77.2433 },
+    "noida": { lat: 28.5355, lng: 77.3910 },
+    "gurugram": { lat: 28.4595, lng: 77.0266 },
+    "gurgaon": { lat: 28.4595, lng: 77.0266 },
+    "mumbai": { lat: 19.0760, lng: 72.8777 },
+    "bengaluru": { lat: 12.9716, lng: 77.5946 },
+    "bangalore": { lat: 12.9716, lng: 77.5946 },
+    "hyderabad": { lat: 17.3850, lng: 78.4867 },
+    "chennai": { lat: 13.0827, lng: 80.2707 },
+    "kolkata": { lat: 22.5726, lng: 88.3639 },
+    "pune": { lat: 18.5204, lng: 73.8567 },
+    "jaipur": { lat: 26.9124, lng: 75.7873 },
+    "lucknow": { lat: 26.8467, lng: 80.9462 },
+    "chandigarh": { lat: 30.7333, lng: 76.7794 },
+    "ahmedabad": { lat: 23.0225, lng: 72.5714 },
+    "indore": { lat: 22.7196, lng: 75.8577 },
+    "bhopal": { lat: 23.2599, lng: 77.4126 },
+    "patna": { lat: 25.5941, lng: 85.1376 },
+  };
+
+  async function resolveDonorLocation(areaText: string) {
+    const lower = areaText.toLowerCase().trim();
+    for (const key of Object.keys(CITY_COORDINATES)) {
+      if (lower.includes(key)) {
+        return {
+          label: areaText,
+          lat: CITY_COORDINATES[key].lat,
+          lng: CITY_COORDINATES[key].lng,
+        };
+      }
+    }
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(areaText + ", India")}&limit=1`
+      );
+      const data = await res.json();
+      if (data && data.length > 0) {
+        return {
+          label: areaText,
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+        };
+      }
+    } catch {
+      // Fallback coordinates
+    }
+    return {
+      label: areaText,
+      lat: 28.6139,
+      lng: 77.2090,
+    };
+  }
 
   const fetchDonors = () => {
     setLoading(true);
     fetch("/api/donors")
       .then((r) => r.json())
       .then((d) => {
-        setDonors(d.donors);
+        setDonors(d?.donors || []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -76,6 +132,7 @@ export default function DonorPage() {
     setRegError("");
     setRegLoading(true);
     try {
+      const donorLoc = await resolveDonorLocation(regAreaInput || "Delhi");
       const res = await fetch("/api/donors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -83,7 +140,7 @@ export default function DonorPage() {
           name: regName,
           phone: regPhone,
           bloodGroup: regBloodGroup,
-          location: LOCATIONS[regLocationIndex],
+          location: donorLoc,
         }),
       });
       if (!res.ok) {
@@ -91,17 +148,15 @@ export default function DonorPage() {
         throw new Error(err.error || "Registration failed.");
       }
       setRegSuccess(true);
-      // Refresh donor list to show the new entry
       fetchDonors();
-      // Auto-close modal after 2 seconds
       setTimeout(() => {
         setShowModal(false);
         setRegSuccess(false);
         setRegName("");
         setRegPhone("");
         setRegBloodGroup("O+");
-        setRegLocationIndex(0);
-      }, 2000);
+        setRegAreaInput("Saket, Delhi");
+      }, 1800);
     } catch (err: unknown) {
       setRegError(err instanceof Error ? err.message : "Registration failed.");
     } finally {
@@ -208,17 +263,29 @@ export default function DonorPage() {
 
                 <div>
                   <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
-                    Your Area
+                    Your Area / City / Locality
                   </label>
-                  <select
-                    value={regLocationIndex}
-                    onChange={(e) => setRegLocationIndex(Number(e.target.value))}
-                    className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
-                  >
-                    {LOCATIONS.map((loc, i) => (
-                      <option key={loc.label} value={i}>{loc.label}</option>
-                    ))}
-                  </select>
+                  <input
+                    required
+                    type="text"
+                    list="donor-area-suggestions"
+                    value={regAreaInput}
+                    onChange={(e) => setRegAreaInput(e.target.value)}
+                    placeholder="e.g. Saket Delhi, Andheri Mumbai, Sector 62 Noida..."
+                    className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition placeholder:text-ink-40"
+                  />
+                  <datalist id="donor-area-suggestions">
+                    <option value="Saket, Delhi" />
+                    <option value="Connaught Place, Delhi" />
+                    <option value="Lajpat Nagar, Delhi" />
+                    <option value="Noida Sector 62" />
+                    <option value="Gurugram Sector 29" />
+                    <option value="Bandra, Mumbai" />
+                    <option value="Indiranagar, Bengaluru" />
+                    <option value="Kothrud, Pune" />
+                    <option value="Gomti Nagar, Lucknow" />
+                    <option value="C-Scheme, Jaipur" />
+                  </datalist>
                 </div>
 
                 <button
