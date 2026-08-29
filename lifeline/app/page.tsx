@@ -9,11 +9,17 @@ import SafetyMatrix from "@/components/SafetyMatrix";
 import RoleCards from "@/components/RoleCards";
 import HowItWorks from "@/components/HowItWorks";
 import FeatureGrid from "@/components/FeatureGrid";
+import InteractiveAlgorithmSimulator from "@/components/InteractiveAlgorithmSimulator";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function Home() {
+  const { language, t } = useLanguage();
   const [selectedScoreFactor, setSelectedScoreFactor] = useState<string>("urgency");
   const [session, setSession] = useState<any>(null);
   const [sessionChecking, setSessionChecking] = useState(true);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(3);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -208,32 +214,111 @@ export default function Home() {
           {/* Nav Links */}
           <div className="hidden lg:flex items-center gap-7 text-xs font-mono uppercase tracking-wider text-ink-60 font-medium">
             <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, "how-it-works")} className="hover:text-blood transition-colors">
-              How It Works
+              {t("nav_how_it_works")}
             </a>
             <a href="#matching-engine" onClick={(e) => handleSmoothScroll(e, "matching-engine")} className="hover:text-blood transition-colors">
-              Matching Engine
+              {t("nav_matching_engine")}
             </a>
             <a href="#safety" onClick={(e) => handleSmoothScroll(e, "safety")} className="hover:text-blood transition-colors">
-              Safety Check
+              {t("nav_safety")}
             </a>
+            <Link href="/analytics" className="text-blood font-bold hover:underline transition-colors flex items-center gap-1">
+              📊 {t("nav_analytics")}
+            </Link>
             <Link href="/donor" className="hover:text-blood transition-colors">
-              For Donors
+              {t("nav_for_donors")}
             </Link>
             <a href="#system-modules" onClick={(e) => handleSmoothScroll(e, "system-modules")} className="hover:text-blood transition-colors">
-              About Us
+              {t("nav_about_us")}
             </a>
           </div>
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-3">
-            {/* Notification Bell */}
-            <div className="relative p-2 rounded-xl bg-white border border-ink-10 text-ink-60 hover:text-ink cursor-pointer transition shadow-sm">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-blood text-white font-mono text-[9px] font-bold rounded-full flex items-center justify-center">
-                3
-              </span>
+            {/* Language Toggle (Feature 6) */}
+            <LanguageToggle />
+
+            {/* Notification Bell with interactive dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowNotifications((prev) => !prev)}
+                className="relative p-2 rounded-xl bg-white border border-ink-10 text-ink-60 hover:text-ink cursor-pointer transition shadow-sm hover:border-ink"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-blood text-white font-mono text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification Dropdown Panel */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border border-ink-10 shadow-2xl p-4 z-50 animate-fade-slide-up text-left">
+                  <div className="flex items-center justify-between border-b border-ink-10 pb-2.5 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-blood animate-pulse" />
+                      <h4 className="font-display text-sm font-bold text-ink">
+                        Live System Alerts
+                      </h4>
+                    </div>
+                    {unreadCount > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setUnreadCount(0)}
+                        className="font-mono text-[10px] text-blood hover:underline font-semibold"
+                      >
+                        Mark as read
+                      </button>
+                    ) : (
+                      <span className="font-mono text-[10px] text-green-700 font-semibold">
+                        All read ✓
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-2.5 max-h-72 overflow-y-auto">
+                    <div className="p-2.5 rounded-xl bg-red-50/80 border border-blood/20 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[9px] font-bold text-blood uppercase tracking-wider">
+                          🚨 Emergency Match Locked
+                        </span>
+                        <span className="font-mono text-[9px] text-ink-40">2m ago</span>
+                      </div>
+                      <p className="mt-1 font-semibold text-ink text-[11px]">
+                        AIIMS Trauma Centre confirmed O- blood unit dispatch.
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-300 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[9px] font-bold text-amber-800 uppercase tracking-wider">
+                          ⚠️ Low Stock Warning
+                        </span>
+                        <span className="font-mono text-[9px] text-ink-40">12m ago</span>
+                      </div>
+                      <p className="mt-1 font-semibold text-ink text-[11px]">
+                        Safdarjung Hospital B- inventory dropped below 5 units.
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-ink-5 border border-ink-10 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[9px] font-bold text-green-700 uppercase tracking-wider">
+                          🙋 Donor Active
+                        </span>
+                        <span className="font-mono text-[9px] text-ink-40">25m ago</span>
+                      </div>
+                      <p className="mt-1 font-semibold text-ink text-[11px]">
+                        Rahul Verma (O+) updated availability to ACTIVE.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Dashboard Button */}
@@ -252,19 +337,20 @@ export default function Home() {
               <button
                 onClick={async () => {
                   await supabase.auth.signOut();
+                  setSession(null);
                   window.location.reload();
                 }}
                 type="button"
-                className="rounded-xl bg-blood px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition hover:bg-blood-light shadow-sm"
+                className="rounded-xl bg-ink-10 px-3.5 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-ink transition hover:bg-ink-20 shadow-sm"
               >
-                Logout
+                {t("logout_btn")}
               </button>
             ) : (
               <Link
                 href="/login"
                 className="rounded-xl bg-blood px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition hover:bg-blood-light shadow-sm"
               >
-                Logout
+                {t("login_btn")}
               </Link>
             )}
           </div>
@@ -275,23 +361,23 @@ export default function Home() {
 
         {/* ── 1. HERO SECTION ── */}
         <section className="grid gap-8 lg:grid-cols-[1fr_460px] items-center pt-2 sm:pt-6 page-enter">
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Tag Pill */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100/70 border border-red-200 shadow-sm">
               <span className="h-2 w-2 rounded-full bg-blood animate-pulse" />
               <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
-                BIO-MATCHING NETWORK V1.2 •
+                {t("hero_badge")}
               </span>
             </div>
 
             {/* Title with ECG waveform line */}
             <div className="space-y-1">
               <h1 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl md:text-[54px] leading-[1.08]">
-                Compatible blood exist.
+                {t("hero_title_part1")}
               </h1>
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="font-display text-4xl sm:text-5xl md:text-[54px] text-blood font-normal italic">
-                  Right on time
+                  {t("hero_title_part2")}
                 </span>
                 {/* SVG ECG Line */}
                 <svg className="w-24 sm:w-32 h-8 text-blood" viewBox="0 0 120 30" fill="none">
@@ -307,7 +393,7 @@ export default function Home() {
             </div>
 
             <p className="max-w-xl text-base text-ink-60 leading-relaxed sm:text-lg">
-              LifeLine connects hospitals, donors, and blood banks through live tracking when every second matters.
+              {t("hero_description")}
             </p>
 
             {/* CTA Buttons */}
@@ -319,27 +405,26 @@ export default function Home() {
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                 </svg>
-                Request Blood
+                {t("hero_cta_emergency")}
               </Link>
-              <a
-                href="#how-it-works"
-                onClick={(e) => handleSmoothScroll(e, "how-it-works")}
+              <Link
+                href="/donor"
                 className="flex items-center gap-2 rounded-2xl border border-ink-10 bg-white px-6 py-3.5 font-display text-sm font-semibold text-ink transition-all hover:border-ink shadow-sm"
               >
-                <span>▶</span> See How It Works
-              </a>
+                <span>🙋</span> {t("hero_cta_donor")}
+              </Link>
             </div>
 
             {/* Trust Badges */}
             <div className="flex flex-wrap items-center gap-6 pt-4 text-xs font-mono uppercase tracking-wider text-ink-60 font-medium">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm">🛡️</span> Secure &amp; Verified
+                <span className="text-sm">🛡️</span> {t("hero_trust_secure")}
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm text-amber-500">⚡</span> Real-time Matching
+                <span className="text-sm text-amber-500">⚡</span> {t("hero_trust_realtime")}
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm text-blood">❤️</span> Save More Lives
+                <span className="text-sm text-blood">❤️</span> {t("hero_trust_save")}
               </div>
             </div>
           </div>
@@ -356,7 +441,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-gradient-to-r from-blood to-red-600 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-white flex items-center gap-1.5 flex-shrink-0 shadow-sm">
                 <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
-                ((•)) LIVE UPDATES
+                ((•)) {t("ticker_live")}
               </div>
               <p className="text-xs sm:text-sm font-medium text-ink flex items-center gap-2 truncate">
                 <span className="text-blood">🩸</span>
@@ -366,7 +451,7 @@ export default function Home() {
             <div className="flex items-center gap-3 font-mono text-xs text-ink-40 justify-end flex-shrink-0">
               <span>12s ago</span>
               <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, "how-it-works")} className="text-blood hover:underline font-semibold">
-                View All →
+                {t("ticker_view_all")}
               </a>
             </div>
           </div>
@@ -388,7 +473,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="font-display text-2xl font-bold text-ink">1,248</h3>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">Units Matched Today</p>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">{t("stat_units_matched")}</p>
             </div>
             {/* Red Mini Sparkline */}
             <svg className="w-full h-5 text-blood/70" viewBox="0 0 100 20" fill="none">
@@ -410,7 +495,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="font-display text-2xl font-bold text-ink">892</h3>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">Active Donors</p>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">{t("stat_active_donors")}</p>
             </div>
             {/* Coral Mini Sparkline */}
             <svg className="w-full h-5 text-rose-500" viewBox="0 0 100 20" fill="none">
@@ -432,7 +517,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="font-display text-2xl font-bold text-ink">156</h3>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">Hospitals Connected</p>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">{t("stat_hospitals_connected")}</p>
             </div>
             {/* Purple Mini Sparkline */}
             <svg className="w-full h-5 text-purple-600" viewBox="0 0 100 20" fill="none">
@@ -449,12 +534,12 @@ export default function Home() {
                 </svg>
               </div>
               <span className="font-mono text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                Excellent
+                {t("stat_avg_response")}
               </span>
             </div>
             <div>
-              <h3 className="font-display text-2xl font-bold text-ink">99.8%</h3>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">Safety Score</p>
+              <h3 className="font-display text-2xl font-bold text-ink">&lt; 1.2s</h3>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">{t("stat_avg_response")}</p>
             </div>
             {/* Blue Mini Sparkline */}
             <svg className="w-full h-5 text-blue-500" viewBox="0 0 100 20" fill="none">
@@ -559,120 +644,29 @@ export default function Home() {
         <HowItWorks handleSmoothScroll={handleSmoothScroll} />
 
         {/* ── 5. MATCHING ENGINE SECTION ── */}
-        <section id="matching-engine" className="reveal-item space-y-10">
-          <div className="grid gap-10 lg:grid-cols-2 items-center">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/60 border border-red-200">
-                <span className="h-1.5 w-1.5 rounded-full bg-blood" />
-                <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
-                  DECISION SYSTEM
-                </span>
-              </div>
-              <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl leading-tight">
-                Not a directory.
-                <br />
-                <span className="italic font-normal text-blood">A live matching engine.</span>
-              </h2>
-              <p className="text-sm text-ink-60 leading-relaxed">
-                LifeLine doesn't simply show a phonebook list. It calculates which eligible source should be surfaced first, taking into account medical safety, distance, and shelf-life.
-              </p>
-
-              {/* Interactive scoring weights panel */}
-              <div className="rounded-3xl border border-ink-10 bg-white p-6 space-y-4 shadow-sm">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
-                  Matching Equation Weights
-                </p>
-                <div className="space-y-2.5">
-                  {[
-                    { key: "urgency", name: "Urgency Level", val: "35%", desc: "Prioritizes critical emergency trauma dispatches instantly." },
-                    { key: "proximity", name: "Distance Proximity", val: "30%", desc: "Calculated using high-accuracy Haversine GPS coordinates." },
-                    { key: "expiry", name: "Inventory Shelf Expiry", val: "20%", desc: "Prioritizes blood banks holding stock nearing expiration." },
-                    { key: "reliability", name: "Donor Turnout Reliability", val: "15%", desc: "Uses historical attendance rates to prevent emergency no-shows." },
-                  ].map((f) => (
-                    <div
-                      key={f.key}
-                      onClick={() => setSelectedScoreFactor(f.key)}
-                      className={`p-3 rounded-2xl border transition-all cursor-pointer ${
-                        selectedScoreFactor === f.key
-                          ? "border-blood bg-red-50/60 shadow-sm"
-                          : "border-transparent hover:bg-stone-50"
-                      }`}
-                    >
-                      <div className="flex justify-between items-center text-xs font-mono">
-                        <span className="font-semibold text-ink">{f.name}</span>
-                        <span className="text-blood font-bold">{f.val}</span>
-                      </div>
-                      {selectedScoreFactor === f.key && (
-                        <p className="mt-1.5 text-xs text-ink-60 font-body animate-fade-in">{f.desc}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <section id="matching-engine" className="reveal-item space-y-8">
+          <div className="text-center max-w-xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/60 border border-red-200">
+              <span className="h-1.5 w-1.5 rounded-full bg-blood" />
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
+                {language === "hi" ? "निर्णय प्रणाली" : "DECISION SYSTEM"}
+              </span>
             </div>
-
-            {/* Simulated ranking panel */}
-            <div className="rounded-3xl border border-ink-10 bg-white p-6 space-y-4 shadow-sm flex flex-col justify-center">
-              <div className="flex items-center justify-between border-b border-ink-10 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-blood animate-pulse" />
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink">
-                    Active Matching Circuit
-                  </span>
-                </div>
-                <span className="font-mono text-[10px] text-ink-60 uppercase font-semibold bg-stone-100 px-2 py-0.5 rounded-full">
-                  Group: B+
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                <div className="rounded-2xl border border-red-200 bg-red-50/70 p-4 relative overflow-hidden transition-all duration-300 hover:scale-[1.01] shadow-sm">
-                  <div className="absolute top-0 right-0 bg-blood text-white font-mono text-[8px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-bl-xl">
-                    #01 BEST MATCH
-                  </div>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-display font-semibold text-sm text-ink">Rahul Verma</h4>
-                      <p className="mt-1 font-mono text-[10px] text-ink-60">O- Donor · 1.2 km away</p>
-                      <p className="mt-0.5 font-mono text-[9px] text-emerald-600 font-semibold">Reliability Rate: 96%</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-display text-2xl font-bold text-blood">94</span>
-                      <p className="font-mono text-[8px] text-blood uppercase tracking-wider font-semibold">Match Score</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-ink-10 bg-white p-4 transition-all duration-300 hover:scale-[1.01] shadow-sm">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-display font-semibold text-sm text-ink">Red Cross Blood Bank</h4>
-                      <p className="mt-1 font-mono text-[10px] text-ink-60">Blood Bank · 2.4 km away</p>
-                      <p className="mt-0.5 font-mono text-[9px] text-amber-600 font-semibold">2 units · Expires in 5 days</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-display text-2xl font-bold text-ink">87</span>
-                      <p className="font-mono text-[8px] text-ink-40 uppercase tracking-wider font-semibold">Match Score</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-ink-10 bg-white p-4 transition-all duration-300 hover:scale-[1.01] shadow-sm">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-display font-semibold text-sm text-ink">Aman Gupta</h4>
-                      <p className="mt-1 font-mono text-[10px] text-ink-60">B+ Donor · 5.1 km away</p>
-                      <p className="mt-0.5 font-mono text-[9px] text-ink-40">Reliability Rate: 82%</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-display text-2xl font-bold text-ink-60">76</span>
-                      <p className="font-mono text-[8px] text-ink-40 uppercase tracking-wider font-semibold">Match Score</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl leading-tight">
+              {language === "hi" ? "सिर्फ डायरेक्टरी नहीं।" : "Not a directory."}
+              <br />
+              <span className="italic font-normal text-blood">
+                {language === "hi" ? "एक लाइव 4-फैक्टर मैचिंग इंजन।" : "A live deterministic matching engine."}
+              </span>
+            </h2>
+            <p className="text-xs sm:text-sm text-ink-60 leading-relaxed">
+              {language === "hi"
+                ? "लाइफ़लाइन पारंपरिक कॉल्स की जगह 4-फैक्टर स्कोरिंग एल्गोरिदम का उपयोग करता है जो मरीज की गंभीरता, निकटता दूरी, समाप्ति रोकथाम और रक्तदाता विश्वसनीयता को संतुलित करता है।"
+                : "LifeLine replaces static phone calls with a scored 4-vector algorithm balancing patient urgency, Haversine travel distance, near-expiry waste prevention, and donor turnout reliability."}
+            </p>
           </div>
+
+          <InteractiveAlgorithmSimulator />
         </section>
 
         {/* ── 6. SAFETY SECTION ── */}
@@ -681,19 +675,26 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/60 border border-red-200">
               <span className="h-1.5 w-1.5 rounded-full bg-blood" />
               <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
-                SAFETY PROTOCOL
+                {language === "hi" ? "सुरक्षा प्रोटोकॉल" : "SAFETY PROTOCOL"}
               </span>
             </div>
             <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl leading-tight">
-              Safety comes
+              {language === "hi" ? "गति से पहले" : "Safety comes"}
               <br />
-              <span className="italic font-normal text-blood">before speed.</span>
+              <span className="italic font-normal text-blood">
+                {language === "hi" ? "सुरक्षा अनिवार्य है।" : "before speed."}
+              </span>
             </h2>
             <p className="text-sm text-ink-60 leading-relaxed">
-              Every demand runs a hard biological circuit check before scoring matches. Incompatible blood is dropped with zero tolerance.
+              {language === "hi"
+                ? "हर अनुरोध मैचिंग से पहले सख्त जैविक फिल्टर से गुजरता है। असंगत रक्त को तुरंत हटा दिया जाता है।"
+                : "Every demand runs a hard biological circuit check before scoring matches. Incompatible blood is dropped with zero tolerance."}
             </p>
             <div className="space-y-3 pt-1">
-              {["ABO/Rh genetic compatibility verified", "Zero-risk algorithmic circuit breaker", "Continuous expiry monitoring"].map((item) => (
+              {(language === "hi"
+                ? ["ABO/Rh आनुवंशिक संगतता सत्यापित", "शून्य-जोखिम सर्किट ब्रेकर", "लगातार समाप्ति निगरानी"]
+                : ["ABO/Rh genetic compatibility verified", "Zero-risk algorithmic circuit breaker", "Continuous expiry monitoring"]
+              ).map((item) => (
                 <div key={item} className="flex items-center gap-2.5">
                   <span className="h-5 w-5 rounded-full bg-red-100 text-blood flex items-center justify-center font-mono text-[10px] font-bold">✓</span>
                   <span className="text-xs text-ink-60 font-mono font-medium uppercase tracking-wider">{item}</span>
@@ -784,27 +785,36 @@ export default function Home() {
 
       </main>
 
-      {/* ── STICKY EMERGENCY SOS WIDGET (BOTTOM RIGHT VERTICAL PILL) ── */}
+      {/* ── HIGH VISIBILITY FLOATING EMERGENCY SOS WIDGET ── */}
       <aside aria-label="Emergency SOS" className="fixed bottom-6 right-6 z-50">
         <Link
-          href="/hospital"
-          className="flex flex-col items-center justify-between w-[92px] h-[135px] rounded-[26px] bg-gradient-to-b from-[#8E1410] via-[#A8201A] to-[#600C08] p-3 text-white border border-red-400/35 shadow-[0_12px_30px_rgba(168,32,26,0.45)] hover:scale-105 transition-all group select-none text-center"
+          href="/emergency"
+          className="relative group flex items-center gap-3.5 bg-gradient-to-r from-[#B91C1C] via-[#991B1B] to-[#7F1D1D] text-white p-2.5 sm:p-3 pr-5 sm:pr-6 rounded-full shadow-[0_10px_35px_rgba(185,28,28,0.55)] hover:shadow-[0_15px_45px_rgba(220,38,38,0.7)] hover:scale-105 transition-all border-2 border-red-400/50 backdrop-blur-md select-none"
         >
-          <div className="flex flex-col items-center">
-            <span className="font-mono text-[8px] uppercase tracking-widest text-red-200 font-extrabold">
-              EMERGENCY
-            </span>
-            <span className="font-display font-extrabold text-xl tracking-tight leading-none mt-0.5 text-white">
-              SOS
-            </span>
-            <span className="text-[8px] text-red-200/90 font-medium mt-1 leading-tight">
-              Need Help<br />Now?
-            </span>
+          {/* Outer Pulsing Radar Rings */}
+          <span className="absolute -inset-1.5 rounded-full bg-red-600/30 animate-ping pointer-events-none" style={{ animationDuration: "2.5s" }} />
+          <span className="absolute -inset-3 rounded-full border border-red-500/20 animate-pulse pointer-events-none" />
+
+          {/* Glowing SOS Circular Core Icon */}
+          <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white text-blood flex flex-col items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform">
+            <span className="font-mono text-[7px] uppercase font-black tracking-widest text-red-600 -mb-0.5">NEED</span>
+            <span className="font-display font-extrabold text-xl sm:text-2xl tracking-tight leading-none text-blood">SOS</span>
           </div>
-          <div className="w-10 h-10 rounded-full bg-white text-blood flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform mt-1">
-            <svg className="w-5 h-5 text-blood" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.24 1.02l-2.21 2.2z"/>
-            </svg>
+
+          {/* Text Labels */}
+          <div className="flex flex-col text-left">
+            <div className="flex items-center gap-2">
+              <span className="font-display font-black text-base sm:text-lg tracking-tight text-white leading-tight uppercase">
+                Emergency SOS
+              </span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+              </span>
+            </div>
+            <span className="font-mono text-[10px] sm:text-[11px] text-red-100/90 font-medium tracking-wide">
+              Instant Blood Match →
+            </span>
           </div>
         </Link>
       </aside>

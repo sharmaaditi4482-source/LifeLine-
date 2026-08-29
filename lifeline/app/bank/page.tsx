@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { BankInventoryUnit, BloodGroup } from "@/lib/types";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function BankPage() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function BankPage() {
   const [units, setUnits] = useState<BankInventoryUnit[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterGroup, setFilterGroup] = useState<BloodGroup | "ALL">("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [bankNameInput, setBankNameInput] = useState("Apollo Hospital Blood Bank");
@@ -68,8 +70,8 @@ export default function BankPage() {
           unitsAvailable: unitsInput,
           expiryDays: expiryDaysInput,
           location: {
-            lat: 28.5600,
-            lng: 77.2200,
+            lat: 28.5672,
+            lng: 77.2100,
             label: locationLabelInput,
           },
         }),
@@ -90,9 +92,18 @@ export default function BankPage() {
   }
 
   const filteredUnits = useMemo(() => {
-    if (filterGroup === "ALL") return units;
-    return units.filter((u) => u.bloodGroup === filterGroup);
-  }, [units, filterGroup]);
+    return units.filter((u) => {
+      if (filterGroup !== "ALL" && u.bloodGroup !== filterGroup) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchesName = u.bankName.toLowerCase().includes(q);
+        const matchesLoc = u.location.label.toLowerCase().includes(q);
+        const matchesId = u.id.toLowerCase().includes(q);
+        if (!matchesName && !matchesLoc && !matchesId) return false;
+      }
+      return true;
+    });
+  }, [units, filterGroup, searchQuery]);
 
   const BLOOD_GROUPS: BloodGroup[] = [
     "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-",
@@ -117,73 +128,105 @@ export default function BankPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14 page-enter">
-      {/* Add Stock Modal */}
+    <>
+      {/* Add Stock Modal - Root Level Overlay */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md card-2xl bg-clay p-6 shadow-2xl">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowAddModal(false);
+              setAddSuccess(false);
+            }
+          }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
+        >
+          <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-ink-10 relative z-[10000] my-auto">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-blood">
-                  Bank Command
+                <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-blood">
+                  ⚡ Blood Bank Command Desk
                 </p>
-                <h2 className="mt-1 font-display text-xl font-semibold text-ink">
-                  Register Blood Stock
+                <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-ink">
+                  Register Blood Stock Batch
                 </h2>
               </div>
               <button
+                type="button"
                 onClick={() => { setShowAddModal(false); setAddSuccess(false); }}
-                className="font-mono text-sm text-ink-40 hover:text-ink transition-colors"
+                className="h-8 w-8 rounded-full bg-ink-5 hover:bg-ink-10 flex items-center justify-center font-mono text-sm text-ink-60 hover:text-ink transition-colors"
               >
                 ✕
               </button>
             </div>
 
             {addSuccess ? (
-              <div className="text-center py-6 space-y-3 animate-fade-in">
-                <div className="h-12 w-12 rounded-full bg-green-100 border border-green-200 flex items-center justify-center mx-auto font-bold text-green-700 text-lg">
+              <div className="text-center py-8 space-y-3">
+                <div className="h-14 w-14 rounded-full bg-green-100 border border-green-200 flex items-center justify-center mx-auto font-bold text-green-700 text-xl">
                   ✓
                 </div>
-                <p className="font-display text-lg font-semibold text-ink">
-                  Blood units registered in live inventory!
+                <p className="font-display text-xl font-bold text-ink">
+                  Blood Batch Added to Live Network!
                 </p>
-                <p className="text-sm text-ink-60">
-                  The matching engine will now route hospital emergencies to your bank.
+                <p className="text-xs text-ink-60 font-mono">
+                  {unitsInput} units of {bloodGroupInput} are now discoverable by nearby trauma centers.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleAddStock} className="space-y-4">
                 <div>
-                  <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
-                    Blood Bank / Hospital Center Name
+                  <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                    Blood Bank / Hospital Facility Name *
                   </label>
                   <input
                     required
+                    list="bank-facility-suggestions"
                     value={bankNameInput}
                     onChange={(e) => setBankNameInput(e.target.value)}
-                    className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
+                    placeholder="e.g. Red Cross Central Blood Bank"
+                    className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm font-semibold text-ink transition focus:border-blood shadow-xs"
                   />
+                  <datalist id="bank-facility-suggestions">
+                    <option value="Red Cross Central Blood Bank" />
+                    <option value="AIIMS Blood Transfusion Center" />
+                    <option value="Apollo Hospital Blood Bank" />
+                    <option value="Max Super Speciality Blood Desk" />
+                    <option value="Jaipur Civil Hospital Blood Centre" />
+                    <option value="Rotary Blood Bank" />
+                  </datalist>
+                </div>
+
+                {/* 1-Click Blood Group Selection */}
+                <div>
+                  <div className="flex items-center justify-between">
+                    <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                      Blood Group *
+                    </label>
+                    <span className="font-mono text-[10px] text-blood font-bold">
+                      Selected: {bloodGroupInput}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                    {BLOOD_GROUPS.map((bg) => (
+                      <button
+                        key={bg}
+                        type="button"
+                        onClick={() => setBloodGroupInput(bg)}
+                        className={`py-2 rounded-xl font-mono text-xs font-bold border transition-all ${
+                          bloodGroupInput === bg
+                            ? "bg-blood text-white border-blood shadow-sm scale-105"
+                            : "bg-white text-ink-60 border-ink-10 hover:border-blood/40 hover:text-blood"
+                        }`}
+                      >
+                        {bg}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
-                      Blood Group
-                    </label>
-                    <select
-                      value={bloodGroupInput}
-                      onChange={(e) => setBloodGroupInput(e.target.value as BloodGroup)}
-                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
-                    >
-                      {BLOOD_GROUPS.map((bg) => (
-                        <option key={bg} value={bg}>{bg}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
-                      Units Available
+                    <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                      Units Available *
                     </label>
                     <input
                       required
@@ -192,15 +235,13 @@ export default function BankPage() {
                       max={100}
                       value={unitsInput}
                       onChange={(e) => setUnitsInput(Number(e.target.value))}
-                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
+                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm font-semibold text-ink transition focus:border-blood shadow-xs"
                     />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
-                      Days to Expiry
+                    <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                      Days to Expiry (Shelf Life) *
                     </label>
                     <input
                       required
@@ -209,29 +250,30 @@ export default function BankPage() {
                       max={45}
                       value={expiryDaysInput}
                       onChange={(e) => setExpiryDaysInput(Number(e.target.value))}
-                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
+                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm font-semibold text-ink transition focus:border-blood shadow-xs"
                     />
                   </div>
+                </div>
 
-                  <div>
-                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
-                      City / Area
-                    </label>
-                    <input
-                      required
-                      value={locationLabelInput}
-                      onChange={(e) => setLocationLabelInput(e.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
-                    />
-                  </div>
+                <div>
+                  <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                    City / Facility Location *
+                  </label>
+                  <input
+                    required
+                    value={locationLabelInput}
+                    onChange={(e) => setLocationLabelInput(e.target.value)}
+                    placeholder="e.g. Connaught Place, Central Delhi"
+                    className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition focus:border-blood shadow-xs"
+                  />
                 </div>
 
                 <button
                   type="submit"
                   disabled={addLoading}
-                  className="w-full rounded-xl bg-blood px-6 py-3 font-display text-sm font-semibold text-white transition hover:bg-blood-light disabled:opacity-50 mt-2"
+                  className="w-full rounded-xl bg-blood px-6 py-3.5 font-display text-sm font-bold text-white transition hover:bg-blood-light disabled:opacity-50 mt-3 shadow-sm hover:shadow-md cursor-pointer"
                 >
-                  {addLoading ? "Saving to Inventory..." : "+ Add to Live Stock"}
+                  {addLoading ? "Registering Batch..." : "+ Confirm & Add to Live Network"}
                 </button>
               </form>
             )}
@@ -239,32 +281,37 @@ export default function BankPage() {
         </div>
       )}
 
-      <div className="flex justify-between items-center w-full">
-        <Link
-          href="/"
-          className="inline-block font-mono text-xs uppercase tracking-widest text-ink-40 transition-colors hover:text-ink"
-        >
-          ← Back
-        </Link>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowAddModal(true)}
-            type="button"
-            className="rounded-xl border border-blood bg-blood px-3.5 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition-all hover:bg-blood-light shadow-sm"
+      <main className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14 page-enter">
+        <div className="flex justify-between items-center w-full relative z-20">
+          <Link
+            href="/"
+            className="inline-block font-mono text-xs uppercase tracking-widest text-ink-40 transition-colors hover:text-ink"
           >
-            + Add Blood Stock
-          </button>
-          <button
-            onClick={handleLogout}
-            type="button"
-            className="font-mono text-xs uppercase tracking-widest text-blood hover:underline font-semibold"
-          >
-            Logout ✕
-          </button>
+            ← Back
+          </Link>
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <button
+              onClick={() => {
+                setAddSuccess(false);
+                setShowAddModal(true);
+              }}
+              type="button"
+              className="rounded-xl border border-blood bg-blood hover:bg-blood-light px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white transition-all shadow-sm active:scale-95 cursor-pointer"
+            >
+              + Add Blood Stock
+            </button>
+            <button
+              onClick={handleLogout}
+              type="button"
+              className="font-mono text-xs uppercase tracking-widest text-blood hover:underline font-semibold"
+            >
+              Logout ✕
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="mt-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div className="mt-5 flex flex-col justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
             Blood Bank Stock
@@ -274,31 +321,54 @@ export default function BankPage() {
           </p>
         </div>
 
-        {/* Filter Controls */}
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setFilterGroup("ALL")}
-            className={`rounded-lg px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider transition-all border ${
-              filterGroup === "ALL"
-                ? "bg-ink text-white border-ink"
-                : "bg-white text-ink-60 border-ink-10 hover:border-ink-40"
-            }`}
-          >
-            All
-          </button>
-          {BLOOD_GROUPS.map((bg) => (
+        {/* Search Bar & Blood Group Filters */}
+        <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-ink-10 shadow-xs">
+          <div className="relative flex-1 max-w-sm">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-ink-40 text-xs">
+              🔍
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by hospital name or city..."
+              className="w-full pl-8 pr-8 py-2 rounded-xl border border-ink-10 bg-clay/50 text-xs font-mono text-ink placeholder:text-ink-40 focus:border-blood/40 shadow-xs transition"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-ink-40 hover:text-ink text-xs font-mono"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
             <button
-              key={bg}
-              onClick={() => setFilterGroup(bg)}
-              className={`rounded-lg px-2.5 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider transition-all border ${
-                filterGroup === bg
-                  ? "bg-blood text-white border-blood"
-                  : "bg-white text-ink-60 border-ink-10 hover:border-blood/40"
+              onClick={() => setFilterGroup("ALL")}
+              className={`rounded-lg px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+                filterGroup === "ALL"
+                  ? "bg-ink text-white border-ink"
+                  : "bg-white text-ink-60 border-ink-10 hover:border-ink-40"
               }`}
             >
-              {bg}
+              All
             </button>
-          ))}
+            {BLOOD_GROUPS.map((bg) => (
+              <button
+                key={bg}
+                onClick={() => setFilterGroup(bg)}
+                className={`rounded-lg px-2.5 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+                  filterGroup === bg
+                    ? "bg-blood text-white border-blood"
+                    : "bg-white text-ink-60 border-ink-10 hover:border-blood/40"
+                }`}
+              >
+                {bg}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -413,5 +483,6 @@ export default function BankPage() {
         </p>
       </div>
     </main>
+  </>
   );
 }

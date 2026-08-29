@@ -1,137 +1,101 @@
 import { NextRequest, NextResponse } from "next/server";
-import { matchRequest } from "@/lib/matchingEngine";
-import { getDonors, getBankUnits, addRequest } from "@/lib/store";
-import { BloodRequest, Donor, BankInventoryUnit, Location } from "@/lib/types";
+import { matchRequest } from "@/lib/services/matchingService";
+import { getDonors, getBankUnits, addRequest, resolveLocation, ensureLocalFacilitiesForLocation } from "@/lib/store";
+import { BloodRequest } from "@/lib/types";
+import { recordLiveEvent } from "@/lib/services/eventService";
 
-// Helper: If custom location is outside Delhi/NCR (>100km from seed data),
-// generate local regional donors and banks around those exact coordinates so matching always works dynamically.
-function getRegionalCandidates(location: Location, dbDonors: Donor[], dbBankUnits: BankInventoryUnit[]) {
-  // Check if any donor is within 80km
-  const hasLocalDonors = dbDonors.some((d) => {
-    const dLat = Math.abs(d.location.lat - location.lat);
-    const dLng = Math.abs(d.location.lng - location.lng);
-    return dLat < 0.8 && dLng < 0.8;
-  });
-
-  if (hasLocalDonors) {
-    return { localDonors: dbDonors, localBankUnits: dbBankUnits };
-  }
-
-  // Generate dynamic realistic regional network around this custom hospital location
-  const offsets = [
-    { name: "Regional Red Cross Blood Bank", type: "bank", dLat: 0.018, dLng: -0.015, bg: "O+", units: 5, days: 6 },
-    { name: "District Government Hospital Reserve", type: "bank", dLat: -0.024, dLng: 0.021, bg: "B+", units: 3, days: 14 },
-    { name: "City Care Blood Center", type: "bank", dLat: 0.035, dLng: 0.012, bg: "A+", units: 4, days: 22 },
-    { name: "Dr. Ananya Verma", type: "donor", dLat: -0.012, dLng: -0.009, bg: "O-", reliability: 0.96 },
-    { name: "Rohit Malhotra", type: "donor", dLat: 0.015, dLng: 0.025, bg: "B+", reliability: 0.88 },
-    { name: "Kavita Rao", type: "donor", dLat: -0.029, dLng: 0.018, bg: "A-", reliability: 0.91 },
-    { name: "Arjun Mehta", type: "donor", dLat: 0.008, dLng: -0.032, bg: "AB+", reliability: 0.85 },
-  ];
-
-  const dynamicDonors: Donor[] = [];
-  const dynamicBanks: BankInventoryUnit[] = [];
-
-  offsets.forEach((item, idx) => {
-    const candLocation: Location = {
-      lat: location.lat + item.dLat,
-      lng: location.lng + item.dLng,
-      label: `Near ${location.label.split(",")[0]}`,
-    };
-
-    if (item.type === "donor") {
-      dynamicDonors.push({
-        id: `dyn_d_${idx}`,
-        name: item.name,
-        phone: "+91 98765 " + (10000 + idx),
-        bloodGroup: item.bg as any,
-        location: candLocation,
-        available: true,
-        reliabilityScore: item.reliability || 0.85,
-        lastDonationDate: "2026-06-15",
-      });
-    } else {
-      const expDate = new Date();
-      expDate.setDate(expDate.getDate() + (item.days || 15));
-      dynamicBanks.push({
-        id: `dyn_b_${idx}`,
-        bankId: `bank_dyn_${idx}`,
-        bankName: item.name,
-        location: candLocation,
-        bloodGroup: item.bg as any,
-        unitsAvailable: item.units || 4,
-        expiryDate: expDate.toISOString(),
-      });
-    }
-  });
-
-  return {
-    localDonors: [...dbDonors, ...dynamicDonors],
-    localBankUnits: [...dbBankUnits, ...dynamicBanks],
-  };
-}
-
+/**
+ * POST /api/match
+ * 
+ * Takes hospital request parameters, records the request, runs the multi-factor
+ * ABO/Rh safe matching engine against verified live database donors and hospital reserves,
+ * records a live event, and returns the sorted matches with score breakdown.
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-
     const { hospitalName, bloodGroup, unitsNeeded, urgency, location } = body;
 
-    if (!hospitalName || !bloodGroup || !unitsNeeded || !urgency || !location) {
+    if (!bloodGroup || !unitsNeeded || !urgency || !location) {
       return NextResponse.json(
-        { error: "Missing required fields." },
+        { error: "Missing required fields: bloodGroup, unitsNeeded, urgency, location." },
         { status: 400 }
       );
     }
 
+    // Resolve accurate coordinates from city / facility label
+    const resolvedLocation = await resolveLocation(location.label || hospitalName, location);
+
+    // Dynamically ensure authentic local hospitals & donors exist for searched city
+    await ensureLocalFacilitiesForLocation(resolvedLocation);
+
     const newRequest: BloodRequest = {
       id: `req_${Date.now()}`,
-      hospitalName,
+      hospitalName: hospitalName || "Emergency Trauma Desk",
       bloodGroup,
       unitsNeeded: Number(unitsNeeded),
       urgency,
-      location,
+      location: resolvedLocation,
       status: "open",
       createdAt: new Date().toISOString(),
     };
 
-    // Load active candidates from database
+    // 1. Fetch real candidate donors & bank inventory units from database
     const dbDonors = await getDonors();
     const dbBankUnits = await getBankUnits();
 
-    // Persist new request
+    // 2. Persist request
     await addRequest(newRequest);
 
-    const { localDonors, localBankUnits } = getRegionalCandidates(location, dbDonors, dbBankUnits);
-
-    const matches = matchRequest(newRequest, {
-      donors: localDonors,
-      bankUnits: localBankUnits,
+    // 3. Evaluate real candidates through matching engine
+    const allMatches = matchRequest(newRequest, {
+      donors: dbDonors,
+      bankUnits: dbBankUnits,
     });
+
+    // Tier 1: Local candidates within emergency transit radius (< 60 km)
+    let matches = allMatches.filter((m) => m.distanceKm <= 60);
+    
+    // Tier 2: If fewer than 2 candidates, escalate to district/regional radius (< 150 km)
+    if (matches.length < 2) {
+      matches = allMatches.filter((m) => m.distanceKm <= 150);
+    }
+    
+    // Tier 3: National escalation fallback if completely empty
+    if (matches.length === 0) {
+      matches = allMatches;
+    }
 
     const escalated = matches.length === 0;
 
-    // Enrich matches with source location data for the map
-    const enrichedMatches = matches.map((m) => {
-      let sourceLocation = null;
-      if (m.sourceType === "donor") {
-        const donor = localDonors.find((d) => d.id === m.sourceId);
-        if (donor) sourceLocation = donor.location;
-      } else {
-        const unit = localBankUnits.find((u) => u.id === m.sourceId);
-        if (unit) sourceLocation = unit.location;
-      }
-      return { ...m, location: sourceLocation };
+    // 4. Record live event for real-time dashboards & landing page feed
+    recordLiveEvent({
+      type: "request_created",
+      title: `${newRequest.urgency.toUpperCase()} ${bloodGroup} Request Raised`,
+      description: `${newRequest.hospitalName} requested ${newRequest.unitsNeeded} unit(s) · ${matches.length} candidate(s) scored`,
+      bloodGroup,
+      locationLabel: location.label || "Emergency Location",
     });
+
+    if (matches.length > 0) {
+      const top = matches[0];
+      recordLiveEvent({
+        type: "match_found",
+        title: `Top Match: ${top.sourceName}`,
+        description: `${top.bloodGroup} (${top.sourceType === "donor" ? "Volunteer Donor" : "Bank Stock"}) · ${top.distanceKm} km away · Score: ${Math.round(top.score * 100)}/100`,
+        bloodGroup: top.bloodGroup,
+        locationLabel: top.location?.label || location.label,
+      });
+    }
 
     return NextResponse.json({
       request: newRequest,
-      matches: enrichedMatches,
+      matches,
       escalated,
     });
   } catch (err) {
-    console.error("Match route error:", err);
     return NextResponse.json(
-      { error: "Something went wrong processing the request." },
+      { error: "Something went wrong processing the matching request." },
       { status: 500 }
     );
   }

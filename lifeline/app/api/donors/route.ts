@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDonors, addDonor } from "@/lib/store";
 import { Donor, BloodGroup } from "@/lib/types";
+import { recordLiveEvent } from "@/lib/services/eventService";
 
+/**
+ * GET /api/donors
+ * Returns all donors with calculated 90-day medical cooldown eligibility.
+ */
 export async function GET() {
   try {
     const donorsList = await getDonors();
@@ -11,10 +16,14 @@ export async function GET() {
   }
 }
 
+/**
+ * POST /api/donors
+ * Registers a new volunteer donor with location, blood group, and last donation date.
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, phone, bloodGroup, location } = body;
+    const { name, phone, bloodGroup, location, lastDonationDate, available } = body;
 
     if (!name || !phone || !bloodGroup || !location) {
       return NextResponse.json(
@@ -29,19 +38,28 @@ export async function POST(req: NextRequest) {
     }
 
     const newDonor: Donor = {
-      id: `d${Date.now()}`,
+      id: `d_${Date.now()}`,
       name,
       phone,
       bloodGroup,
       location,
-      available: true,
-      reliabilityScore: 0.75, // default starting reliability for new donors
-      lastDonationDate: new Date().toISOString().split("T")[0],
+      available: available !== undefined ? available : true,
+      reliabilityScore: 0.85, // Standard baseline reliability score
+      lastDonationDate: lastDonationDate || "2026-05-01",
     };
 
-    await addDonor(newDonor);
+    const savedDonor = await addDonor(newDonor);
 
-    return NextResponse.json({ success: true, donor: newDonor }, { status: 201 });
+    // Record live event
+    recordLiveEvent({
+      type: "donor_registered",
+      title: `New ${bloodGroup} Donor Registered`,
+      description: `${name} joined LifeLine verified network from ${location.label}`,
+      bloodGroup,
+      locationLabel: location.label,
+    });
+
+    return NextResponse.json({ success: true, donor: savedDonor }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ error: "Failed to register donor." }, { status: 500 });
   }

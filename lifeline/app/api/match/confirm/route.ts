@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestById, updateRequestStatus } from "@/lib/store";
+import { recordLiveEvent } from "@/lib/services/eventService";
 
 /**
  * PATCH /api/match/confirm
- * Body: { requestId: string, confirmedSourceId: string }
+ * Body: { requestId: string, confirmedSourceId: string, confirmedSourceName?: string }
  *
- * Locks the matched request database-side.
- * First-confirmed-locks: once a sourceId is confirmed, status changes to
- * "confirmed" and no other source can be confirmed for this request.
+ * Applies First-Confirmed-Lock on the request:
+ * - Changes status to "confirmed"
+ * - Publishes live confirmation event to event bus
+ * - Releasing other candidates
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const { requestId, confirmedSourceId } = await req.json();
+    const { requestId, confirmedSourceId, confirmedSourceName } = await req.json();
 
     if (!requestId || !confirmedSourceId) {
       return NextResponse.json(
@@ -36,8 +38,17 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Apply first-confirmed-lock in Supabase database
+    // Apply first-confirmed-lock in database
     await updateRequestStatus(requestId, "confirmed");
+
+    // Publish live confirmation event
+    recordLiveEvent({
+      type: "match_confirmed",
+      title: `Match Locked: ${request.bloodGroup}`,
+      description: `Confirmed for ${request.hospitalName} · Candidate [${confirmedSourceName || confirmedSourceId}] assigned for immediate transfusion`,
+      bloodGroup: request.bloodGroup,
+      locationLabel: request.location.label,
+    });
 
     return NextResponse.json({
       success: true,
@@ -48,7 +59,6 @@ export async function PATCH(req: NextRequest) {
       message: "Match locked. All other candidates auto-released.",
     });
   } catch (err) {
-    console.error("Confirm match API error:", err);
     return NextResponse.json(
       { error: "Failed to confirm match." },
       { status: 500 }

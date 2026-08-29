@@ -8,6 +8,14 @@ export interface Location {
   label: string;
 }
 
+export interface DonorEligibility {
+  isEligible: boolean;
+  daysSinceLastDonation: number;
+  cooldownDaysRemaining: number;
+  cooldownPeriodDays: number; // standard 90 days
+  statusText: string;
+}
+
 export interface Donor {
   id: string;
   name: string;
@@ -16,7 +24,10 @@ export interface Donor {
   location: Location;
   available: boolean;
   reliabilityScore: number; // 0 to 1, based on past show-up rate
-  lastDonationDate: string;
+  lastDonationDate: string; // ISO date string (YYYY-MM-DD)
+  totalDonations?: number;
+  isVerified?: boolean;
+  eligibility?: DonorEligibility;
 }
 
 export interface BankInventoryUnit {
@@ -26,7 +37,22 @@ export interface BankInventoryUnit {
   location: Location;
   bloodGroup: BloodGroup;
   unitsAvailable: number;
-  expiryDate: string; // ISO date
+  expiryDate: string; // ISO date string
+}
+
+export interface HospitalInventoryItem {
+  bloodGroup: BloodGroup;
+  unitsAvailable: number;
+  isLowStock: boolean; // true if units < 5
+  lastUpdated: string;
+}
+
+export interface HospitalProfile {
+  id: string;
+  name: string;
+  location: Location;
+  phone: string;
+  inventory: Record<BloodGroup, number>;
 }
 
 export interface BloodRequest {
@@ -42,6 +68,13 @@ export interface BloodRequest {
 
 export type MatchSourceType = "donor" | "bank";
 
+export interface MatchScoreBreakdown {
+  urgency: number;     // 0.35 weight
+  proximity: number;   // 0.30 weight
+  expiry: number;      // 0.20 weight
+  reliability: number; // 0.15 weight
+}
+
 export interface MatchResult {
   sourceType: MatchSourceType;
   sourceId: string;
@@ -49,10 +82,36 @@ export interface MatchResult {
   bloodGroup: BloodGroup;
   distanceKm: number;
   score: number;
-  breakdown: {
-    urgency: number;
-    proximity: number;
-    expiry: number;
-    reliability: number;
-  };
+  breakdown: MatchScoreBreakdown;
+  eligibilityNote?: string;
+  location?: Location;
+  phone?: string;
+  totalDonations?: number;
+  isVerified?: boolean;
+}
+
+export interface DonorBadge {
+  tier: "bronze" | "silver" | "gold" | "diamond";
+  badgeName: string;
+  badgeIcon: string;
+  donationCount: number;
+  estimatedLivesSaved: number;
+}
+
+export interface PredictiveShortageRisk {
+  bloodGroup: BloodGroup;
+  currentUnits: number;
+  riskLevel: "CRITICAL" | "MODERATE" | "STABLE";
+  estimatedRunoutHours: number;
+  recommendation: string;
+}
+
+export interface LiveEvent {
+  id: string;
+  type: "request_created" | "match_found" | "match_confirmed" | "stock_updated" | "donor_registered" | "alert_sent" | "donor_verified" | "donation_completed";
+  title: string;
+  description: string;
+  bloodGroup: BloodGroup;
+  locationLabel: string;
+  timestamp: string; // ISO string
 }

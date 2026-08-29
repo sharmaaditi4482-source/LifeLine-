@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import JudgeEvaluationDrawer from "@/components/JudgeEvaluationDrawer";
+import { LanguageProvider } from "@/lib/languageContext";
 
 export const metadata: Metadata = {
   title: "LifeLine — Real-Time Blood Demand Matching",
@@ -24,8 +26,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased font-body bg-clay text-ink">
-        {children}
+      <body className="min-h-screen antialiased font-body bg-clay text-ink relative">
+        <LanguageProvider>
+          <JudgeEvaluationDrawer />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
