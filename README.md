@@ -1,5 +1,10 @@
 # 🩸 LifeLine — Real-Time Blood Demand Matching & Inventory Platform
 
+[![Deployment Status](https://img.shields.io/badge/Deployment-Live%20on%20Vercel-success?style=for-the-badge&logo=vercel)](https://lifeline-aditi.vercel.app)
+[![Tests Passing](https://img.shields.io/badge/Tests-39%2F39%20Passed-brightgreen?style=for-the-badge)](https://lifeline-aditi.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-16%20App%20Router-black?style=for-the-badge&logo=next.js)](https://lifeline-aditi.vercel.app)
+
+> 🌐 **Live Production Link:** **[https://lifeline-aditi.vercel.app](https://lifeline-aditi.vercel.app)**  
 > **Every second counts in the emergency supply chain.**  
 > LifeLine is a real-time bio-logistics platform that connects **voluntary blood donors**, **hospital emergency desks**, and **blood bank reserves** through a deterministic multi-factor scoring engine and automated safety circuits — replacing 45-minute phone trees with sub-second verified matches.
 
