@@ -216,7 +216,7 @@ export default function EmergencyPage() {
 
           {/* Top row */}
           <div className="flex items-center justify-between mb-5">
-            <Link href="/" className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-white/60 hover:text-white transition-colors">
+            <Link href="/" className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
               </svg>
@@ -227,7 +227,7 @@ export default function EmergencyPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
               </span>
-              <span className="font-mono text-[10px] uppercase tracking-widest text-white/70 font-semibold">Live Line Active</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-white/70 font-semibold">Live Line Active</span>
             </div>
           </div>
 
@@ -248,7 +248,7 @@ export default function EmergencyPage() {
 
             {/* Title */}
             <div>
-              <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-white/50 mb-1">LifeLine Emergency System</p>
+              <p className="font-mono text-xs sm:text-xs uppercase tracking-[0.25em] text-white/50 mb-1">LifeLine Emergency System</p>
               <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-[1.05] tracking-tight">
                 Emergency<br/>
                 <span className="italic font-semibold text-red-200">Blood Request</span>
@@ -271,7 +271,7 @@ export default function EmergencyPage() {
               {gpsState === "locked" ? "📍" : gpsState === "detecting" ? "⏳" : "⚠️"}
             </span>
             <div className="flex-1 min-w-0">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-white/50">
+              <p className="font-mono text-xs uppercase tracking-widest text-white/50">
                 {gpsState === "locked" ? "GPS Auto-Detected" : gpsState === "detecting" ? "Detecting Location…" : "GPS Unavailable"}
               </p>
               <p className="font-mono text-xs text-white font-semibold truncate">
@@ -282,7 +282,7 @@ export default function EmergencyPage() {
             </div>
             {gpsState !== "detecting" && (
               <button type="button" onClick={handleDetectGPS}
-                className="flex-shrink-0 font-mono text-[10px] font-bold text-white bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-lg transition-colors">
+                className="flex-shrink-0 font-mono text-xs font-bold text-white bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-lg transition-colors">
                 {gpsState === "locked" ? "Re-detect" : "Try GPS"}
               </button>
             )}
@@ -300,13 +300,13 @@ export default function EmergencyPage() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-blood/10 border border-blood/20 px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-blood animate-pulse" />
-              <span className="font-mono text-[10px] uppercase tracking-widest text-blood font-bold">Critical Urgency (100% Weight)</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-blood font-bold">Critical Urgency (100% Weight)</span>
             </span>
           </div>
 
           {/* 1-Click Demo Fill Presets */}
           <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
-            <span className="text-ink-40 text-[10px] uppercase font-bold">⚡ Quick Presets:</span>
+            <span className="text-ink-40 text-xs uppercase font-bold">⚡ Quick Presets:</span>
             <button
               type="button"
               onClick={() => {
@@ -318,7 +318,7 @@ export default function EmergencyPage() {
                 setLocationStatus("28.5672, 77.2100");
                 setGpsState("locked");
               }}
-              className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-blood hover:text-white text-blood border border-blood/20 text-[10px] font-semibold transition-colors"
+              className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-blood hover:text-white text-blood border border-blood/20 text-xs font-semibold transition-colors"
             >
               AIIMS (AB+ Universal Match)
             </button>
@@ -333,7 +333,7 @@ export default function EmergencyPage() {
                 setLocationStatus("28.5700, 77.2070");
                 setGpsState("locked");
               }}
-              className="px-2.5 py-1 rounded-lg bg-ink-5 hover:bg-blood hover:text-white text-ink-60 border border-ink-10 text-[10px] font-semibold transition-colors"
+              className="px-2.5 py-1 rounded-lg bg-ink-5 hover:bg-blood hover:text-white text-ink-60 border border-ink-10 text-xs font-semibold transition-colors"
             >
               Safdarjung (O- Critical)
             </button>
@@ -346,7 +346,7 @@ export default function EmergencyPage() {
 
           {/* Contact Name */}
           <div>
-            <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+            <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
               Your Name <span className="normal-case font-normal text-ink-40/50 tracking-normal">— optional</span>
             </label>
             <input value={contactName} onChange={(e) => setContactName(e.target.value)}
@@ -356,7 +356,7 @@ export default function EmergencyPage() {
 
           {/* Contact Phone */}
           <div>
-            <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+            <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
               Phone <span className="normal-case font-normal text-ink-40/50 tracking-normal">— optional</span>
             </label>
             <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)}
@@ -367,9 +367,9 @@ export default function EmergencyPage() {
           {/* Location */}
           <div className="sm:col-span-2">
             <div className="flex justify-between items-center">
-              <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">Location / City *</label>
+              <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">Location / City *</label>
               <button type="button" onClick={handleDetectGPS}
-                className="font-mono text-[10px] text-blood hover:underline font-bold flex items-center gap-1 transition-colors">
+                className="font-mono text-xs text-blood hover:underline font-bold flex items-center gap-1 transition-colors">
                 📍 Use My GPS
               </button>
             </div>
@@ -419,7 +419,7 @@ export default function EmergencyPage() {
               <option value="Janakpuri, West Delhi" />
             </datalist>
             {locationStatus && (
-              <p className={`mt-1.5 font-mono text-[11px] ${gpsState === "locked" ? "text-green-600" : "text-ink-40"}`}>
+              <p className={`mt-1.5 font-mono text-xs ${gpsState === "locked" ? "text-green-600" : "text-ink-40"}`}>
                 {gpsState === "locked" ? "✓ GPS: " : ""}{locationStatus}
               </p>
             )}
@@ -428,10 +428,10 @@ export default function EmergencyPage() {
           {/* Blood Group with Quick 1-Click Buttons */}
           <div className="sm:col-span-2 space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+              <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                 Blood Group Needed *
               </label>
-              <span className="font-mono text-[10px] text-blood font-bold">
+              <span className="font-mono text-xs text-blood font-bold">
                 Selected: {bloodGroup}
               </span>
             </div>
@@ -454,7 +454,7 @@ export default function EmergencyPage() {
           </div>
 
           <div className="sm:col-span-2">
-            <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">Units Needed *</label>
+            <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">Units Needed *</label>
             <input type="number" min={1} max={20} value={unitsNeeded}
               onChange={(e) => setUnitsNeeded(Number(e.target.value))}
               className="mt-1.5 w-full rounded-xl border border-ink-10 bg-[#FAFAF9] px-4 py-2.5 text-sm text-ink focus:border-blood/30 focus:outline-none focus:bg-white transition" />
@@ -500,7 +500,7 @@ export default function EmergencyPage() {
               {!escalated && (
                 <div className="flex-shrink-0 flex items-center gap-1.5 rounded-full bg-green-50 border border-green-200 px-3 py-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-green-700 font-semibold">Live Matches</span>
+                  <span className="font-mono text-xs uppercase tracking-widest text-green-700 font-semibold">Live Matches</span>
                 </div>
               )}
             </div>
@@ -535,12 +535,12 @@ export default function EmergencyPage() {
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2 mb-1">
                               {i === 0 && !isReleased && (
-                                <span className="rounded-lg bg-blood px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-white">
+                                <span className="rounded-lg bg-blood px-2.5 py-0.5 font-mono text-xs font-bold uppercase tracking-widest text-white">
                                   Best Match
                                 </span>
                               )}
                               <p className="font-display text-base font-semibold text-ink sm:text-lg">{m.sourceName}</p>
-                              <span className="font-mono text-[10px] text-ink-40 bg-ink-5 rounded-md px-2 py-0.5">
+                              <span className="font-mono text-xs text-ink-40 bg-ink-5 rounded-md px-2 py-0.5">
                                 {m.sourceType === "donor" ? "🙋 Donor" : "🏥 Blood Bank"}
                               </span>
                             </div>
@@ -577,7 +577,7 @@ export default function EmergencyPage() {
                             { label: "Reliability", value: m.breakdown.reliability },
                           ].map((item) => (
                             <div key={item.label} className="text-center">
-                              <p className="font-mono text-[9px] uppercase tracking-widest text-ink-40">{item.label}</p>
+                              <p className="font-mono text-xs uppercase tracking-widest text-ink-60">{item.label}</p>
                               <p className="font-mono text-xs font-semibold text-ink mt-0.5">{item.value.toFixed(2)}</p>
                               {/* Mini progress bar */}
                               <div className="mt-1 h-1 rounded-full bg-ink-5 overflow-hidden">

@@ -295,7 +295,7 @@ export default function LoginPage() {
 
           <div>
             {/* Top Badge */}
-            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-red-400">
+            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-red-400">
               <span className="h-2 w-2 rounded-full bg-blood animate-pulse" />
               LifeLine Bio-Secure
             </div>
@@ -311,10 +311,10 @@ export default function LoginPage() {
 
           {/* Quick 1-Click Demo Roles for Evaluators */}
           <div className="my-6 pt-5 border-t border-white/10 space-y-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-amber-300 font-bold block">
+            <span className="font-mono text-xs uppercase tracking-widest text-amber-300 font-bold block">
               ⚡ Evaluator 1-Click Fill:
             </span>
-            <div className="grid grid-cols-3 gap-1.5 font-mono text-[10px]">
+            <div className="grid grid-cols-3 gap-1.5 font-mono text-xs">
               <button
                 type="button"
                 onClick={() => handleQuickDemoLogin("hospital")}
@@ -352,7 +352,7 @@ export default function LoginPage() {
           </div>
 
           {/* Bottom Security Pill */}
-          <div className="flex items-center justify-between text-[10px] font-mono text-white/40 pt-2">
+          <div className="flex items-center justify-between text-xs font-mono text-white/40 pt-2">
             <span>SECURE JWT AUTH</span>
             <span className="text-emerald-400 font-semibold">● ONLINE</span>
           </div>
@@ -414,7 +414,7 @@ export default function LoginPage() {
             {/* Form */}
             <form onSubmit={handleAuth} className="space-y-3.5">
               <div>
-                <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                   Email Address
                 </label>
                 <input
@@ -428,7 +428,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                   Password
                 </label>
                 <input
@@ -453,7 +453,7 @@ export default function LoginPage() {
             {/* Divider */}
             <div className="my-4 flex items-center gap-3">
               <div className="flex-1 h-px bg-ink-10" />
-              <span className="font-mono text-[9px] uppercase tracking-widest text-ink-40">or continue with</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-ink-60">or continue with</span>
               <div className="flex-1 h-px bg-ink-10" />
             </div>
 
@@ -482,7 +482,7 @@ export default function LoginPage() {
                 setErrorText("");
                 setMessage("");
               }}
-              className="font-mono text-[10px] uppercase tracking-wider text-blood hover:underline font-semibold"
+              className="font-mono text-xs uppercase tracking-wider text-blood hover:underline font-semibold"
             >
               {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up"}
             </button>

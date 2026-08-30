@@ -20,6 +20,23 @@ export default function Home() {
   const [sessionChecking, setSessionChecking] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(3);
+  const [pageLoadTime] = useState(() => Date.now());
+
+  // Dynamic notification data — timestamps computed relative to page load
+  const getNotifications = () => {
+    const elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
+    const fmtAgo = (baseSec: number) => {
+      const s = baseSec + elapsed;
+      if (s < 60) return `${s}s ago`;
+      if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+      return `${Math.floor(s / 3600)}h ago`;
+    };
+    return [
+      { type: "emergency" as const, label: "🚨 Emergency Match Locked", time: fmtAgo(45), text: "AIIMS Trauma Centre confirmed O- blood unit dispatch." },
+      { type: "warning" as const, label: "⚠️ Low Stock Warning", time: fmtAgo(420), text: "Safdarjung Hospital B- inventory dropped below 5 units." },
+      { type: "donor" as const, label: "🙋 Donor Active", time: fmtAgo(900), text: "Rahul Verma (O+) updated availability to ACTIVE." },
+    ];
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -205,14 +222,14 @@ export default function Home() {
               <span className="font-display font-bold text-sm tracking-wider text-ink leading-tight">
                 LIFELINE
               </span>
-              <span className="font-mono text-[9px] uppercase tracking-widest text-blood font-semibold -mt-0.5">
+              <span className="font-mono text-xs uppercase tracking-widest text-blood font-semibold -mt-0.5">
                 ENGINE
               </span>
             </div>
           </Link>
 
           {/* Nav Links */}
-          <div className="hidden lg:flex items-center gap-7 text-xs font-mono uppercase tracking-wider text-ink-60 font-medium">
+          <div className="hidden lg:flex items-center gap-7 text-xs font-mono uppercase tracking-wider text-ink font-semibold">
             <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, "how-it-works")} className="hover:text-blood transition-colors">
               {t("nav_how_it_works")}
             </a>
@@ -252,7 +269,7 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-blood text-white font-mono text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-blood text-white font-mono text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                     {unreadCount}
                   </span>
                 )}
@@ -272,53 +289,31 @@ export default function Home() {
                       <button
                         type="button"
                         onClick={() => setUnreadCount(0)}
-                        className="font-mono text-[10px] text-blood hover:underline font-semibold"
+                        className="font-mono text-xs text-blood hover:underline font-semibold"
                       >
                         Mark as read
                       </button>
                     ) : (
-                      <span className="font-mono text-[10px] text-green-700 font-semibold">
+                      <span className="font-mono text-xs text-green-700 font-semibold">
                         All read ✓
                       </span>
                     )}
                   </div>
 
                   <div className="space-y-2.5 max-h-72 overflow-y-auto">
-                    <div className="p-2.5 rounded-xl bg-red-50/80 border border-blood/20 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[9px] font-bold text-blood uppercase tracking-wider">
-                          🚨 Emergency Match Locked
-                        </span>
-                        <span className="font-mono text-[9px] text-ink-40">2m ago</span>
+                    {getNotifications().map((n, i) => (
+                      <div key={i} className={`p-2.5 rounded-xl text-xs ${n.type === "emergency" ? "bg-red-50/80 border border-blood/20" : n.type === "warning" ? "bg-amber-50/80 border border-amber-300" : "bg-green-50/60 border border-green-200"}`}>
+                        <div className="flex items-center justify-between">
+                          <span className={`font-mono text-xs font-bold uppercase tracking-wider ${n.type === "emergency" ? "text-blood" : n.type === "warning" ? "text-amber-800" : "text-green-700"}`}>
+                            {n.label}
+                          </span>
+                          <span className="font-mono text-xs text-ink-40">{n.time}</span>
+                        </div>
+                        <p className="mt-1 font-semibold text-ink text-xs">
+                          {n.text}
+                        </p>
                       </div>
-                      <p className="mt-1 font-semibold text-ink text-[11px]">
-                        AIIMS Trauma Centre confirmed O- blood unit dispatch.
-                      </p>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-300 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[9px] font-bold text-amber-800 uppercase tracking-wider">
-                          ⚠️ Low Stock Warning
-                        </span>
-                        <span className="font-mono text-[9px] text-ink-40">12m ago</span>
-                      </div>
-                      <p className="mt-1 font-semibold text-ink text-[11px]">
-                        Safdarjung Hospital B- inventory dropped below 5 units.
-                      </p>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-ink-5 border border-ink-10 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[9px] font-bold text-green-700 uppercase tracking-wider">
-                          🙋 Donor Active
-                        </span>
-                        <span className="font-mono text-[9px] text-ink-40">25m ago</span>
-                      </div>
-                      <p className="mt-1 font-semibold text-ink text-[11px]">
-                        Rahul Verma (O+) updated availability to ACTIVE.
-                      </p>
-                    </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -327,7 +322,7 @@ export default function Home() {
             {/* Dashboard Button */}
             <Link
               href="/hospital"
-              className="flex items-center gap-2 rounded-xl border border-ink-10 bg-white px-3.5 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-ink transition hover:border-ink shadow-sm"
+              className="flex items-center gap-2 rounded-xl border border-ink-10 bg-white px-3.5 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-ink transition hover:border-ink shadow-sm"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -344,14 +339,14 @@ export default function Home() {
                   window.location.reload();
                 }}
                 type="button"
-                className="rounded-xl bg-ink-10 px-3.5 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-ink transition hover:bg-ink-20 shadow-sm"
+                className="rounded-xl bg-ink-10 px-3.5 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-ink transition hover:bg-ink-20 shadow-sm"
               >
                 {t("logout_btn")}
               </button>
             ) : (
               <Link
                 href="/login"
-                className="rounded-xl bg-blood px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-white transition hover:bg-blood-light shadow-sm"
+                className="rounded-xl bg-blood px-4 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-blood-light shadow-sm"
               >
                 {t("login_btn")}
               </Link>
@@ -368,7 +363,7 @@ export default function Home() {
             {/* Tag Pill */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100/70 border border-red-200 shadow-sm">
               <span className="h-2 w-2 rounded-full bg-blood animate-pulse" />
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-blood">
                 {t("hero_badge")}
               </span>
             </div>
@@ -448,7 +443,7 @@ export default function Home() {
         <section className="reveal-item w-full">
           <div className="rounded-2xl bg-white border border-ink-10 p-2.5 sm:p-3 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-gradient-to-r from-blood to-red-600 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-white flex items-center gap-1.5 flex-shrink-0 shadow-sm">
+              <div className="rounded-xl bg-gradient-to-r from-blood to-red-600 px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5 flex-shrink-0 shadow-sm">
                 <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
                 ((•)) {t("ticker_live")}
               </div>
@@ -476,13 +471,13 @@ export default function Home() {
                   <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                 </svg>
               </div>
-              <span className="font-mono text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              <span className="font-mono text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                 ↑ 12%
               </span>
             </div>
             <div>
               <h3 className="font-display text-2xl font-bold text-ink">1,248</h3>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">{t("stat_units_matched")}</p>
+              <p className="font-mono text-xs uppercase tracking-wider text-ink-60 mt-0.5">{t("stat_units_matched")}</p>
             </div>
             {/* Red Mini Sparkline */}
             <svg className="w-full h-5 text-blood/70" viewBox="0 0 100 20" fill="none">
@@ -498,13 +493,13 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <span className="font-mono text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              <span className="font-mono text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                 ↑ 8%
               </span>
             </div>
             <div>
               <h3 className="font-display text-2xl font-bold text-ink">892</h3>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">{t("stat_active_donors")}</p>
+              <p className="font-mono text-xs uppercase tracking-wider text-ink-60 mt-0.5">{t("stat_active_donors")}</p>
             </div>
             {/* Coral Mini Sparkline */}
             <svg className="w-full h-5 text-rose-500" viewBox="0 0 100 20" fill="none">
@@ -520,13 +515,13 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <span className="font-mono text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              <span className="font-mono text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                 ↑ 5%
               </span>
             </div>
             <div>
               <h3 className="font-display text-2xl font-bold text-ink">156</h3>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">{t("stat_hospitals_connected")}</p>
+              <p className="font-mono text-xs uppercase tracking-wider text-ink-60 mt-0.5">{t("stat_hospitals_connected")}</p>
             </div>
             {/* Purple Mini Sparkline */}
             <svg className="w-full h-5 text-purple-600" viewBox="0 0 100 20" fill="none">
@@ -542,13 +537,13 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <span className="font-mono text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              <span className="font-mono text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                 {t("stat_avg_response")}
               </span>
             </div>
             <div>
               <h3 className="font-display text-2xl font-bold text-ink">&lt; 1.2s</h3>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-ink-40 mt-0.5">{t("stat_avg_response")}</p>
+              <p className="font-mono text-xs uppercase tracking-wider text-ink-60 mt-0.5">{t("stat_avg_response")}</p>
             </div>
             {/* Blue Mini Sparkline */}
             <svg className="w-full h-5 text-blue-500" viewBox="0 0 100 20" fill="none">
@@ -657,7 +652,7 @@ export default function Home() {
           <div className="text-center max-w-xl mx-auto space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/60 border border-red-200">
               <span className="h-1.5 w-1.5 rounded-full bg-blood" />
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-blood">
                 {language === "hi" ? "निर्णय प्रणाली" : "DECISION SYSTEM"}
               </span>
             </div>
@@ -683,7 +678,7 @@ export default function Home() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/60 border border-red-200">
               <span className="h-1.5 w-1.5 rounded-full bg-blood" />
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-blood">
                 {language === "hi" ? "सुरक्षा प्रोटोकॉल" : "SAFETY PROTOCOL"}
               </span>
             </div>
@@ -705,7 +700,7 @@ export default function Home() {
                 : ["ABO/Rh genetic compatibility verified", "Zero-risk algorithmic circuit breaker", "Continuous expiry monitoring"]
               ).map((item) => (
                 <div key={item} className="flex items-center gap-2.5">
-                  <span className="h-5 w-5 rounded-full bg-red-100 text-blood flex items-center justify-center font-mono text-[10px] font-bold">✓</span>
+                  <span className="h-5 w-5 rounded-full bg-red-100 text-blood flex items-center justify-center font-mono text-xs font-bold">✓</span>
                   <span className="text-xs text-ink-60 font-mono font-medium uppercase tracking-wider">{item}</span>
                 </div>
               ))}
@@ -726,7 +721,7 @@ export default function Home() {
             <div className="relative z-10 max-w-xl mx-auto space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/80 border border-red-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-blood" />
-                <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
+                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-blood">
                   CONNECT WITH LIFELINE
                 </span>
               </div>
@@ -783,7 +778,7 @@ export default function Home() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
               </span>
             </div>
-            <span className="font-mono text-[10px] sm:text-[11px] text-red-100/90 font-medium tracking-wide">
+            <span className="font-mono text-xs sm:text-xs text-red-100/90 font-medium tracking-wide">
               Instant Blood Match →
             </span>
           </div>
@@ -793,11 +788,11 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className="border-t border-ink-10 bg-white py-12 mt-20">
         <div className="mx-auto max-w-5xl px-5 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-ink-40">
+          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-60">
             <span className="h-1.5 w-1.5 rounded-full bg-blood" />
             LIFELINE COOPERATIVE SYSTEM
           </div>
-          <p className="font-mono text-[9px] text-ink-40 tracking-wider">
+          <p className="font-mono text-xs text-ink-40 tracking-wider">
             © 2026 LIFELINE. FOR DEMONSTRATION &amp; HACKATHON DEMO USE ONLY.
           </p>
         </div>

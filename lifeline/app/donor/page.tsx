@@ -219,7 +219,7 @@ export default function DonorPage() {
   if (authChecking) {
     return (
       <main className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14 text-center">
-        <p className="font-mono text-xs uppercase tracking-widest text-ink-40">Authenticating Access…</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-ink-60">Authenticating Access…</p>
       </main>
     );
   }
@@ -235,7 +235,7 @@ export default function DonorPage() {
           <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-ink-10 my-auto relative z-[10000]">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-blood">
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-blood">
                   Volunteer Registry
                 </p>
                 <h2 className="mt-1 font-display text-xl font-semibold text-ink">
@@ -271,7 +271,7 @@ export default function DonorPage() {
                 )}
 
                 <div>
-                  <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                  <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                     Full Name *
                   </label>
                   <input
@@ -286,10 +286,10 @@ export default function DonorPage() {
                 {/* Blood Group with Quick 1-Click Buttons */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                    <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                       Blood Group *
                     </label>
-                    <span className="font-mono text-[10px] text-blood font-bold">
+                    <span className="font-mono text-xs text-blood font-bold">
                       {regBloodGroup}
                     </span>
                   </div>
@@ -312,7 +312,7 @@ export default function DonorPage() {
                 </div>
 
                 <div>
-                  <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                  <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                     Phone *
                   </label>
                   <input
@@ -327,13 +327,13 @@ export default function DonorPage() {
 
                 <div>
                   <div className="flex justify-between items-center">
-                    <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                    <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                       Location / City *
                     </label>
                     <button
                       type="button"
                       onClick={handleDetectGPS}
-                      className="font-mono text-[10px] text-blood hover:underline font-semibold"
+                      className="font-mono text-xs text-blood hover:underline font-semibold"
                     >
                       📍 Auto-Detect GPS
                     </button>
@@ -363,12 +363,12 @@ export default function DonorPage() {
                     <option value="Janakpuri, West Delhi" />
                   </datalist>
                   {gpsStatus && (
-                    <p className="mt-1 font-mono text-[10px] text-green-700">{gpsStatus}</p>
+                    <p className="mt-1 font-mono text-xs text-green-700">{gpsStatus}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="font-mono text-[10px] font-medium uppercase tracking-widest text-ink-40">
+                  <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                     Last Blood Donation Date (90-day Cooldown)
                   </label>
                   <input
@@ -377,7 +377,7 @@ export default function DonorPage() {
                     onChange={(e) => setRegLastDonationDate(e.target.value)}
                     className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition"
                   />
-                  <p className="mt-1 font-mono text-[9px] text-ink-40">
+                  <p className="mt-1 font-mono text-xs text-ink-40">
                     Used to determine medical safety eligibility (minimum 90-day interval).
                   </p>
                 </div>
@@ -400,7 +400,7 @@ export default function DonorPage() {
       <div className="flex justify-between items-center w-full">
         <Link
           href="/"
-          className="inline-block font-mono text-xs uppercase tracking-widest text-ink-40 transition-colors hover:text-ink"
+          className="inline-block font-mono text-xs uppercase tracking-widest text-ink-60 transition-colors hover:text-ink"
         >
           ← Back
         </Link>
@@ -439,19 +439,19 @@ export default function DonorPage() {
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="card-2xl p-4 bg-white border-ink-10 text-center">
             <p className="font-display text-2xl font-semibold text-ink">{donors.length}</p>
-            <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-ink-40">Total Registered</p>
+            <p className="mt-1 font-mono text-xs uppercase tracking-widest text-ink-60">Total Registered</p>
           </div>
           <div className="card-2xl p-4 bg-white border-ink-10 text-center">
             <p className="font-display text-2xl font-semibold text-green-700">{availableCount}</p>
-            <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-ink-40">Ready to Donate</p>
+            <p className="mt-1 font-mono text-xs uppercase tracking-widest text-ink-60">Ready to Donate</p>
           </div>
           <div className="card-2xl p-4 bg-white border-ink-10 text-center">
             <p className="font-display text-2xl font-semibold text-ink">{eligibleCount}</p>
-            <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-ink-40">Medical Safe (&gt;90d)</p>
+            <p className="mt-1 font-mono text-xs uppercase tracking-widest text-ink-60">Medical Safe (&gt;90d)</p>
           </div>
           <div className="card-2xl p-4 bg-amber-50/70 border-amber-200 text-center">
             <p className="font-display text-2xl font-semibold text-amber-800">{inCooldownCount}</p>
-            <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-amber-700">In 90-day Cooldown</p>
+            <p className="mt-1 font-mono text-xs uppercase tracking-widest text-amber-700">In 90-day Cooldown</p>
           </div>
         </div>
       )}
@@ -461,7 +461,7 @@ export default function DonorPage() {
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setFilterGroup("ALL")}
-            className={`rounded-lg px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+            className={`rounded-lg px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition-all border ${
               filterGroup === "ALL"
                 ? "bg-ink text-white border-ink"
                 : "bg-white text-ink-60 border-ink-10 hover:border-ink-40"
@@ -473,7 +473,7 @@ export default function DonorPage() {
             <button
               key={bg}
               onClick={() => setFilterGroup(bg)}
-              className={`rounded-lg px-2.5 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+              className={`rounded-lg px-2.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition-all border ${
                 filterGroup === bg
                   ? "bg-blood text-white border-blood"
                   : "bg-white text-ink-60 border-ink-10 hover:border-blood/40"
@@ -485,7 +485,7 @@ export default function DonorPage() {
         </div>
 
         {/* Eligibility Filter */}
-        <div className="flex rounded-xl border border-ink-10 bg-white p-1 text-[10px] font-mono">
+        <div className="flex rounded-xl border border-ink-10 bg-white p-1 text-xs font-mono">
           <button
             onClick={() => setFilterEligibility("ALL")}
             className={`px-2.5 py-1 rounded-lg transition-all font-semibold ${
@@ -516,7 +516,7 @@ export default function DonorPage() {
         <button
           type="button"
           onClick={() => setSortByDistance(!sortByDistance)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider border transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider border transition-all ${
             sortByDistance
               ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
               : "bg-white text-ink-60 border-ink-10 hover:border-emerald-500 hover:text-emerald-700"
@@ -535,7 +535,7 @@ export default function DonorPage() {
         </div>
       ) : filteredDonors.length === 0 ? (
         <div className="mt-12 text-center card-2xl p-10 border-ink-10 bg-white">
-          <p className="font-mono text-xs uppercase tracking-widest text-ink-40">No Matches</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-ink-60">No Matches</p>
           <p className="mt-2 font-display text-lg text-ink font-medium">No donors match this criteria right now.</p>
         </div>
       ) : (
@@ -564,22 +564,22 @@ export default function DonorPage() {
                       >
                         {d.name}
                       </Link>
-                      <span className="font-mono text-[10px] text-ink-40 uppercase">
+                      <span className="font-mono text-xs text-ink-40 uppercase">
                         ID: {d.id}
                       </span>
                       {/* Verified Donor Badge */}
                       {d.isVerified && (
-                        <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 font-mono text-[9px] font-bold">
+                        <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 font-mono text-xs font-bold">
                           ✅ Verified
                         </span>
                       )}
                       {/* Lives Saved Badge */}
-                      <span className="rounded-full bg-blood-50 text-blood border border-blood/20 px-2 py-0.5 font-mono text-[9px] font-bold">
+                      <span className="rounded-full bg-blood-50 text-blood border border-blood/20 px-2 py-0.5 font-mono text-xs font-bold">
                         🩸 {d.totalDonations ?? (d.id === "d1" ? 6 : d.id === "d6" ? 8 : 3)} Lives Saved
                       </span>
                       {/* Medical Eligibility Badge */}
                       <span
-                        className={`rounded-full px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider ${
+                        className={`rounded-full px-2.5 py-0.5 font-mono text-xs font-bold uppercase tracking-wider ${
                           isEligible
                             ? "bg-green-50 text-green-700 border border-green-200"
                             : "bg-amber-50 text-amber-800 border border-amber-200"
@@ -589,7 +589,7 @@ export default function DonorPage() {
                       </span>
                       {/* Live GPS Distance Badge */}
                       {distFromUser !== null && (
-                        <span className="rounded-full bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-0.5 font-mono text-[9px] font-bold">
+                        <span className="rounded-full bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-0.5 font-mono text-xs font-bold">
                           📍 {distFromUser} km from you
                         </span>
                       )}
@@ -607,7 +607,7 @@ export default function DonorPage() {
                     <button
                       onClick={(e) => handleToggleAvailability(e, d.id, d.available)}
                       disabled={togglingId === d.id}
-                      className={`flex items-center gap-2 rounded-xl px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider border transition-all ${
+                      className={`flex items-center gap-2 rounded-xl px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider border transition-all ${
                         d.available
                           ? "bg-green-50 text-green-700 border-green-300 hover:bg-green-100"
                           : "bg-ink-5 text-ink-40 border-ink-10 hover:bg-ink-10"
@@ -624,7 +624,7 @@ export default function DonorPage() {
 
                     <Link
                       href={`/donor/${d.id}`}
-                      className="rounded-xl border border-ink-10 bg-white px-3 py-1.5 font-mono text-[10px] uppercase font-semibold text-ink-60 hover:text-blood hover:border-blood transition-all"
+                      className="rounded-xl border border-ink-10 bg-white px-3 py-1.5 font-mono text-xs uppercase font-semibold text-ink-60 hover:text-blood hover:border-blood transition-all"
                     >
                       View Profile →
                     </Link>

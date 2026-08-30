@@ -51,7 +51,7 @@ export default function HowItWorks({ handleSmoothScroll }: HowItWorksProps) {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/60 border border-red-200">
             <span className="h-1.5 w-1.5 rounded-full bg-blood" />
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-blood">
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-blood">
               {isHindi ? "कार्यप्रणाली प्रोटोकॉल" : "OPERATIONS PROTOCOL"}
             </span>
           </div>
@@ -89,7 +89,7 @@ export default function HowItWorks({ handleSmoothScroll }: HowItWorksProps) {
             </div>
             <div className="pt-3 border-t border-ink-10 flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              <span className="font-mono text-[9px] uppercase tracking-widest text-ink-40 font-semibold">
+              <span className="font-mono text-xs uppercase tracking-widest text-ink-40 font-semibold">
                 {item.badge}
               </span>
             </div>

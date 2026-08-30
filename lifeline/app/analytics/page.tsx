@@ -110,13 +110,13 @@ export default function AnalyticsDashboard() {
         <div>
           <Link
             href="/"
-            className="inline-block font-mono text-xs uppercase tracking-widest text-ink-40 transition-colors hover:text-ink mb-2"
+            className="inline-block font-mono text-xs uppercase tracking-widest text-ink-60 transition-colors hover:text-ink mb-2"
           >
             ← Back to Home
           </Link>
           <h1 className="font-display text-2xl sm:text-4xl font-bold text-ink flex items-center gap-3">
             <span>Regional Analytics & Impact</span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider text-emerald-800">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               Live Telemetry
             </span>
@@ -147,7 +147,7 @@ export default function AnalyticsDashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {/* Metric 1 */}
         <div className="card-2xl p-5 bg-white border border-ink-10 shadow-sm">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40 block">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60 block">
             Total Matches Locked
           </span>
           <div className="mt-2 flex items-baseline gap-2">
@@ -161,7 +161,7 @@ export default function AnalyticsDashboard() {
 
         {/* Metric 2 */}
         <div className="card-2xl p-5 bg-white border border-ink-10 shadow-sm">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40 block">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60 block">
             Most Requested Group
           </span>
           <div className="mt-2 flex items-baseline gap-2">
@@ -175,7 +175,7 @@ export default function AnalyticsDashboard() {
 
         {/* Metric 3 */}
         <div className="card-2xl p-5 bg-white border border-ink-10 shadow-sm">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40 block">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60 block">
             Avg Engine Response
           </span>
           <div className="mt-2 flex items-baseline gap-2">
@@ -189,7 +189,7 @@ export default function AnalyticsDashboard() {
 
         {/* Metric 4 */}
         <div className="card-2xl p-5 bg-white border border-ink-10 shadow-sm">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40 block">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60 block">
             Total Lives Saved
           </span>
           <div className="mt-2 flex items-baseline gap-2">
@@ -214,7 +214,7 @@ export default function AnalyticsDashboard() {
                 Daily blood unit demand across seeded Delhi-NCR facilities
               </p>
             </div>
-            <span className="font-mono text-[10px] font-bold uppercase text-blood bg-blood-50 px-2.5 py-1 rounded-md">
+            <span className="font-mono text-xs font-bold uppercase text-blood bg-blood-50 px-2.5 py-1 rounded-md">
               Usage Velocity
             </span>
           </div>
@@ -279,7 +279,7 @@ export default function AnalyticsDashboard() {
                 Recent requests vs. active available donors & bank units by blood group
               </p>
             </div>
-            <span className="font-mono text-[10px] font-bold uppercase text-ink-60 bg-ink-5 px-2.5 py-1 rounded-md">
+            <span className="font-mono text-xs font-bold uppercase text-ink-60 bg-ink-5 px-2.5 py-1 rounded-md">
               ABO/Rh Matrix
             </span>
           </div>
@@ -312,7 +312,7 @@ export default function AnalyticsDashboard() {
       {/* ── Network Health & Facility Registry Breakdown ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card-2xl p-5 bg-white border border-ink-10 space-y-3">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-ink-40 font-bold block">
+          <span className="font-mono text-xs uppercase tracking-widest text-ink-60 font-bold block">
             Donor Trust & Verification
           </span>
           <div className="flex items-center justify-between pt-1">
@@ -324,13 +324,13 @@ export default function AnalyticsDashboard() {
           <div className="w-full bg-ink-5 h-2 rounded-full overflow-hidden">
             <div className="bg-emerald-500 h-full rounded-full" style={{ width: "75%" }} />
           </div>
-          <p className="text-[11px] text-ink-40 font-mono pt-1">
+          <p className="text-xs text-ink-40 font-mono pt-1">
             Verified badge awards +0.05 Reliability score in emergency matching engine.
           </p>
         </div>
 
         <div className="card-2xl p-5 bg-white border border-ink-10 space-y-3">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-ink-40 font-bold block">
+          <span className="font-mono text-xs uppercase tracking-widest text-ink-60 font-bold block">
             Connected Regional Hubs
           </span>
           <div className="flex items-center justify-between pt-1">
@@ -340,13 +340,13 @@ export default function AnalyticsDashboard() {
           <div className="w-full bg-ink-5 h-2 rounded-full overflow-hidden">
             <div className="bg-blood h-full rounded-full" style={{ width: "100%" }} />
           </div>
-          <p className="text-[11px] text-ink-40 font-mono pt-1">
+          <p className="text-xs text-ink-40 font-mono pt-1">
             AIIMS, Safdarjung, Max Saket, Apollo, Fortis Noida, Red Cross Blood Bank.
           </p>
         </div>
 
         <div className="card-2xl p-5 bg-white border border-ink-10 space-y-3">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-ink-40 font-bold block">
+          <span className="font-mono text-xs uppercase tracking-widest text-ink-60 font-bold block">
             Safety & Cooldown Compliance
           </span>
           <div className="flex items-center justify-between pt-1">
@@ -356,7 +356,7 @@ export default function AnalyticsDashboard() {
           <div className="w-full bg-ink-5 h-2 rounded-full overflow-hidden">
             <div className="bg-emerald-600 h-full rounded-full" style={{ width: "100%" }} />
           </div>
-          <p className="text-[11px] text-ink-40 font-mono pt-1">
+          <p className="text-xs text-ink-40 font-mono pt-1">
             Strict 90-day boundary check eliminates ineligible donor dispatch risk.
           </p>
         </div>
@@ -373,7 +373,7 @@ export default function AnalyticsDashboard() {
               Audit log of real-time requests, matches, confirmations, and alerts
             </p>
           </div>
-          <span className="font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+          <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
             3s Polling
           </span>
@@ -388,10 +388,10 @@ export default function AnalyticsDashboard() {
                 </span>
                 <div>
                   <p className="font-semibold text-ink">{evt.title}</p>
-                  <p className="text-ink-60 text-[11px]">{evt.description}</p>
+                  <p className="text-ink-60 text-xs">{evt.description}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 sm:text-right font-mono text-[10px] text-ink-40">
+              <div className="flex items-center gap-3 sm:text-right font-mono text-xs text-ink-40">
                 <span>📍 {evt.locationLabel}</span>
                 <span>·</span>
                 <span>{new Date(evt.timestamp).toLocaleTimeString()}</span>

@@ -419,7 +419,7 @@ export default function HospitalDashboard() {
   if (authChecking) {
     return (
       <main className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14 text-center">
-        <p className="font-mono text-xs uppercase tracking-widest text-ink-40">Authenticating Access…</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-ink-60">Authenticating Access…</p>
       </main>
     );
   }
@@ -430,7 +430,7 @@ export default function HospitalDashboard() {
       <div className="flex justify-between items-center w-full">
         <Link
           href="/"
-          className="inline-block font-mono text-xs uppercase tracking-widest text-ink-40 transition-colors hover:text-ink"
+          className="inline-block font-mono text-xs uppercase tracking-widest text-ink-60 transition-colors hover:text-ink"
         >
           ← Back
         </Link>
@@ -505,7 +505,7 @@ export default function HospitalDashboard() {
                 }`} />
               </span>
               <div>
-                <p className="font-mono text-[10px] uppercase font-bold tracking-widest text-ink-60">
+                <p className="font-mono text-xs uppercase font-bold tracking-widest text-ink-60">
                   {gpsLocked ? "🟢 Live Device GPS Active" : "📍 Emergency GPS Ready"}
                 </p>
                 <p className="font-mono text-xs font-semibold text-ink truncate">
@@ -529,7 +529,7 @@ export default function HospitalDashboard() {
           >
             {/* Hospital Name Input with Type + Autocomplete Datalist */}
             <div>
-              <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-ink-40">
+              <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                 {t("hosp_name_label")}
               </label>
               <input
@@ -562,13 +562,13 @@ export default function HospitalDashboard() {
             {/* Dynamic Location Search Input with Autocomplete Datalist */}
             <div>
               <div className="flex justify-between items-center">
-                <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-ink-40">
+                <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                   {t("donor_location_label")}
                 </label>
                 <button
                   type="button"
                   onClick={handleDetectLocation}
-                  className="font-mono text-[10px] text-blood hover:underline font-semibold flex items-center gap-1"
+                  className="font-mono text-xs text-blood hover:underline font-semibold flex items-center gap-1"
                 >
                   📍 GPS
                 </button>
@@ -620,10 +620,10 @@ export default function HospitalDashboard() {
 
             {/* Quick Location Presets */}
             <div className="sm:col-span-2 -mt-2">
-              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
                 <span className="text-ink-60">{locationStatus}</span>
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-ink-40 uppercase text-[9px] font-bold">Quick Presets:</span>
+                  <span className="text-ink-40 uppercase text-xs font-bold">Quick Presets:</span>
                   {PRESET_LOCATIONS.map((loc) => (
                     <button
                       key={loc.label}
@@ -634,7 +634,7 @@ export default function HospitalDashboard() {
                         setHospitalName(loc.label.split(",")[0]);
                         setLocationStatus(`✓ Lat: ${loc.lat}, Lng: ${loc.lng}`);
                       }}
-                      className="px-2 py-0.5 rounded-md bg-ink-5 hover:bg-blood/10 hover:text-blood text-ink-60 text-[10px] transition-colors"
+                      className="px-2 py-0.5 rounded-md bg-ink-5 hover:bg-blood/10 hover:text-blood text-ink-60 text-xs transition-colors"
                     >
                       {loc.label.split(",")[0]}
                     </button>
@@ -646,10 +646,10 @@ export default function HospitalDashboard() {
             {/* Blood Group with Quick 1-Click Buttons */}
             <div className="sm:col-span-2 space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-ink-40">
+                <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                   {t("hosp_blood_group_label")}
                 </label>
-                <span className="font-mono text-[10px] text-blood font-bold">
+                <span className="font-mono text-xs text-blood font-bold">
                   Selected: {bloodGroup}
                 </span>
               </div>
@@ -673,7 +673,7 @@ export default function HospitalDashboard() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-ink-40">
+                <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                   {t("hosp_units_label")}
                 </label>
                 <input
@@ -687,7 +687,7 @@ export default function HospitalDashboard() {
               </div>
 
               <div>
-                <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-ink-40">
+                <label className="font-mono text-xs font-medium uppercase tracking-widest text-ink-60">
                   {t("hosp_urgency_label")}
                 </label>
                 <select
@@ -761,13 +761,13 @@ export default function HospitalDashboard() {
               {smsToasts.length > 0 && (
                 <div className="mt-4 rounded-2xl border border-sky-200 bg-sky-50/80 p-4 space-y-2 animate-fade-in">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] uppercase tracking-widest font-bold text-sky-800 flex items-center gap-1.5">
+                    <span className="font-mono text-xs uppercase tracking-widest font-bold text-sky-800 flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-sky-500 animate-ping" />
                       Live SMS / WhatsApp Dispatch Log ({smsToasts.length} Sent)
                     </span>
                     <button
                       onClick={() => setSmsToasts([])}
-                      className="font-mono text-[10px] text-sky-600 hover:underline"
+                      className="font-mono text-xs text-sky-600 hover:underline"
                     >
                       Dismiss
                     </button>
@@ -816,7 +816,7 @@ export default function HospitalDashboard() {
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 {i === 0 && !isReleased && (
-                                  <span className="rounded-lg bg-blood px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-white">
+                                  <span className="rounded-lg bg-blood px-2.5 py-1 font-mono text-xs font-semibold uppercase tracking-widest text-white">
                                     Best match
                                   </span>
                                 )}
@@ -829,14 +829,14 @@ export default function HospitalDashboard() {
 
                                 {/* Feature 2: Verified Trust Badge */}
                                 {isDonor && isVerifiedDonor && (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-700">
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 font-mono text-xs font-bold text-emerald-700">
                                     ✅ Verified
                                   </span>
                                 )}
 
                                 {/* Feature 1: Lives Saved Badge */}
                                 {isDonor && (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-blood-50 border border-blood/20 px-2 py-0.5 font-mono text-[10px] font-bold text-blood">
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-blood-50 border border-blood/20 px-2 py-0.5 font-mono text-xs font-bold text-blood">
                                     🩸 {m.totalDonations ?? (m.sourceId === "d1" ? 6 : m.sourceId === "d6" ? 8 : 3)} Lives Saved
                                   </span>
                                 )}
@@ -911,7 +911,7 @@ export default function HospitalDashboard() {
                               { label: "Reliability (15%)", value: m.breakdown.reliability },
                             ].map((item) => (
                               <div key={item.label}>
-                                <span className="font-mono text-[9px] uppercase tracking-widest text-ink-40 block">
+                                <span className="font-mono text-xs uppercase tracking-widest text-ink-60 block">
                                   {item.label}
                                 </span>
                                 <span className="font-mono text-xs font-semibold text-ink">
@@ -950,7 +950,7 @@ export default function HospitalDashboard() {
           {/* Hospital Account Switcher (Searchable / Typeable with Autocomplete) */}
           <div className="card-2xl p-5 bg-white border-ink-10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex-1 max-w-lg">
-              <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+              <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                 Active Hospital Account (Type or Search)
               </label>
               <div className="mt-1.5 flex gap-2">
@@ -976,7 +976,7 @@ export default function HospitalDashboard() {
                 </datalist>
               </div>
               {/* Quick 1-click hospital pills */}
-              <div className="mt-2 flex flex-wrap gap-1.5 font-mono text-[10px]">
+              <div className="mt-2 flex flex-wrap gap-1.5 font-mono text-xs">
                 {hospitals.map((h) => (
                   <button
                     key={h.id}
@@ -998,7 +998,7 @@ export default function HospitalDashboard() {
               <div className="text-left sm:text-right flex-shrink-0">
                 <p className="font-mono text-xs font-semibold text-ink">📍 {activeHospital.location.label}</p>
                 <p className="font-mono text-xs text-ink-40">📞 {activeHospital.phone}</p>
-                <p className="font-mono text-[10px] text-emerald-700 font-bold mt-1">✓ Live Inventory Synced</p>
+                <p className="font-mono text-xs text-emerald-700 font-bold mt-1">✓ Live Inventory Synced</p>
               </div>
             )}
           </div>
@@ -1020,12 +1020,12 @@ export default function HospitalDashboard() {
                     <h3 className="font-display text-base font-bold text-amber-950">
                       Predictive 7-Day Shortage Alert
                     </h3>
-                    <p className="font-mono text-[11px] text-amber-800">
+                    <p className="font-mono text-xs text-amber-800">
                       Calculated from real 7-day emergency request velocity vs. live reserves (no black-box ML)
                     </p>
                   </div>
                 </div>
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-2.5 py-1 rounded-full">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-2.5 py-1 rounded-full">
                   Proactive Forecast
                 </span>
               </div>
@@ -1046,7 +1046,7 @@ export default function HospitalDashboard() {
                           {alert.alertBannerText}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] font-mono text-ink-60 bg-amber-50 px-2.5 py-1 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs font-mono text-ink-60 bg-amber-50 px-2.5 py-1 rounded-lg">
                         <span>Burn: <strong>{alert.dailyBurnRate} u/day</strong></span>
                         <span>·</span>
                         <span>7-Day Req: <strong>{alert.recent7DayRequests} u</strong></span>
@@ -1082,11 +1082,11 @@ export default function HospitalDashboard() {
 
                       {/* Low stock warning badge */}
                       {isLow ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-blood px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-white animate-pulse">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-blood px-2.5 py-0.5 font-mono text-xs font-bold uppercase tracking-widest text-white animate-pulse">
                           ⚠️ Low Stock
                         </span>
                       ) : (
-                        <span className="rounded-full bg-green-50 border border-green-200 px-2 py-0.5 font-mono text-[9px] font-semibold text-green-700">
+                        <span className="rounded-full bg-green-50 border border-green-200 px-2 py-0.5 font-mono text-xs font-semibold text-green-700">
                           Optimal
                         </span>
                       )}
@@ -1099,7 +1099,7 @@ export default function HospitalDashboard() {
                         </span>
                         <span className="font-mono text-xs text-ink-40 ml-1.5">Units</span>
                       </div>
-                      <span className="font-mono text-[10px] text-ink-40">
+                      <span className="font-mono text-xs text-ink-40">
                         Min: {LOW_STOCK_THRESHOLD} units
                       </span>
                     </div>
@@ -1139,7 +1139,7 @@ export default function HospitalDashboard() {
                     Predictive 48h Shortage Forecaster (Demand Velocity AI)
                   </h3>
                 </div>
-                <span className="font-mono text-[10px] font-bold text-blood bg-blood-50 border border-blood/20 px-2 py-0.5 rounded">
+                <span className="font-mono text-xs font-bold text-blood bg-blood-50 border border-blood/20 px-2 py-0.5 rounded">
                   Clinical Proactive Rebalancing
                 </span>
               </div>
@@ -1164,7 +1164,7 @@ export default function HospitalDashboard() {
                           Stock: {risk.currentUnits} units
                         </span>
                         <span
-                          className={`font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                          className={`font-mono text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
                             risk.riskLevel === "CRITICAL"
                               ? "bg-blood text-white animate-pulse"
                               : "bg-amber-600 text-white"
@@ -1173,7 +1173,7 @@ export default function HospitalDashboard() {
                           {risk.riskLevel} Risk (~{risk.estimatedRunoutHours}h runout)
                         </span>
                       </div>
-                      <p className="mt-2 font-mono text-[11px] text-ink-70 leading-relaxed">
+                      <p className="mt-2 font-mono text-xs text-ink-70 leading-relaxed">
                         👉 {risk.recommendation}
                       </p>
                     </div>
@@ -1184,7 +1184,7 @@ export default function HospitalDashboard() {
 
           {/* Info Banner */}
           <div className="card-2xl p-5 bg-white border-ink-10">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-40">
+            <p className="font-mono text-xs font-bold uppercase tracking-widest text-ink-60">
               Low-Stock Alert Logic & Cooperative Protocol
             </p>
             <p className="mt-1 text-xs text-ink-60 leading-relaxed">

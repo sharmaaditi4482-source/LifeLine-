@@ -84,7 +84,7 @@ export default function LiveFeed() {
         </div>
 
         {/* Timestamp */}
-        <span className="font-mono text-[10px] uppercase tracking-widest text-ink-40 animate-fade-in flex-shrink-0">
+        <span className="font-mono text-xs uppercase tracking-widest text-ink-40 animate-fade-in flex-shrink-0">
           {formatTimeAgo(currentEvent.timestamp)}
         </span>
       </div>

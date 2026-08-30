@@ -122,7 +122,7 @@ export default function BankPage() {
   if (authChecking) {
     return (
       <main className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14 text-center">
-        <p className="font-mono text-xs uppercase tracking-widest text-ink-40">Authenticating Access...</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-ink-60">Authenticating Access...</p>
       </main>
     );
   }
@@ -143,7 +143,7 @@ export default function BankPage() {
           <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-ink-10 relative z-[10000] my-auto">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-blood">
+                <p className="font-mono text-xs font-bold uppercase tracking-widest text-blood">
                   ⚡ Blood Bank Command Desk
                 </p>
                 <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-ink">
@@ -174,7 +174,7 @@ export default function BankPage() {
             ) : (
               <form onSubmit={handleAddStock} className="space-y-4">
                 <div>
-                  <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                  <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                     Blood Bank / Hospital Facility Name *
                   </label>
                   <input
@@ -198,10 +198,10 @@ export default function BankPage() {
                 {/* 1-Click Blood Group Selection */}
                 <div>
                   <div className="flex items-center justify-between">
-                    <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                    <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                       Blood Group *
                     </label>
-                    <span className="font-mono text-[10px] text-blood font-bold">
+                    <span className="font-mono text-xs text-blood font-bold">
                       Selected: {bloodGroupInput}
                     </span>
                   </div>
@@ -225,7 +225,7 @@ export default function BankPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                    <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                       Units Available *
                     </label>
                     <input
@@ -240,7 +240,7 @@ export default function BankPage() {
                   </div>
 
                   <div>
-                    <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                    <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                       Days to Expiry (Shelf Life) *
                     </label>
                     <input
@@ -256,7 +256,7 @@ export default function BankPage() {
                 </div>
 
                 <div>
-                  <label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">
+                  <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
                     City / Facility Location *
                   </label>
                   <input
@@ -285,7 +285,7 @@ export default function BankPage() {
         <div className="flex justify-between items-center w-full relative z-20">
           <Link
             href="/"
-            className="inline-block font-mono text-xs uppercase tracking-widest text-ink-40 transition-colors hover:text-ink"
+            className="inline-block font-mono text-xs uppercase tracking-widest text-ink-60 transition-colors hover:text-ink"
           >
             ← Back
           </Link>
@@ -347,7 +347,7 @@ export default function BankPage() {
           <div className="flex flex-wrap gap-1.5">
             <button
               onClick={() => setFilterGroup("ALL")}
-              className={`rounded-lg px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+              className={`rounded-lg px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition-all border ${
                 filterGroup === "ALL"
                   ? "bg-ink text-white border-ink"
                   : "bg-white text-ink-60 border-ink-10 hover:border-ink-40"
@@ -359,7 +359,7 @@ export default function BankPage() {
               <button
                 key={bg}
                 onClick={() => setFilterGroup(bg)}
-                className={`rounded-lg px-2.5 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+                className={`rounded-lg px-2.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition-all border ${
                   filterGroup === bg
                     ? "bg-blood text-white border-blood"
                     : "bg-white text-ink-60 border-ink-10 hover:border-blood/40"
@@ -377,19 +377,19 @@ export default function BankPage() {
         <div className="mt-6 grid grid-cols-3 gap-3">
           <div className="card-2xl p-4 bg-white border-ink-10 text-center">
             <p className="font-display text-2xl font-semibold text-ink">{totalUnits}</p>
-            <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-ink-40">Total Units</p>
+            <p className="mt-1 font-mono text-xs uppercase tracking-widest text-ink-60">Total Units</p>
           </div>
           <div className={`card-2xl p-4 text-center ${nearExpiryCount > 0 ? "bg-blood-50 border-blood/20" : "bg-white border-ink-10"}`}>
             <p className={`font-display text-2xl font-semibold ${nearExpiryCount > 0 ? "text-blood" : "text-ink"}`}>
               {nearExpiryCount}
             </p>
-            <p className={`mt-1 font-mono text-[10px] uppercase tracking-widest ${nearExpiryCount > 0 ? "text-blood/70" : "text-ink-40"}`}>
+            <p className={`mt-1 font-mono text-xs uppercase tracking-widest ${nearExpiryCount > 0 ? "text-blood/70" : "text-ink-40"}`}>
               Near Expiry
             </p>
           </div>
           <div className="card-2xl p-4 bg-white border-ink-10 text-center">
             <p className="font-display text-2xl font-semibold text-ink">{uniqueBanks}</p>
-            <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-ink-40">Partner Banks</p>
+            <p className="mt-1 font-mono text-xs uppercase tracking-widest text-ink-60">Partner Banks</p>
           </div>
         </div>
       )}
@@ -412,7 +412,7 @@ export default function BankPage() {
         </div>
       ) : filteredUnits.length === 0 ? (
         <div className="mt-12 text-center card-2xl p-10 border-ink-10 bg-white">
-          <p className="font-mono text-xs uppercase tracking-widest text-ink-40">Out of Stock</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-ink-60">Out of Stock</p>
           <p className="mt-2 font-display text-lg text-ink font-medium">No units matching this blood group are available.</p>
           <p className="mt-1 text-sm text-ink-60 max-w-sm mx-auto">
             Try checking general donor registries or scaling matching alerts.
@@ -442,7 +442,7 @@ export default function BankPage() {
                       <h3 className="font-display text-lg font-semibold text-ink">
                         {u.bankName}
                       </h3>
-                      <span className="font-mono text-[10px] text-ink-40 uppercase tracking-wider">
+                      <span className="font-mono text-xs text-ink-40 uppercase tracking-wider">
                         ID: {u.id}
                       </span>
                     </div>
@@ -454,12 +454,12 @@ export default function BankPage() {
 
                   <div className="flex items-center gap-3 flex-shrink-0">
                     {nearExpiry && (
-                      <span className="font-mono text-[9px] uppercase tracking-wider text-blood font-bold">
+                      <span className="font-mono text-xs uppercase tracking-wider text-blood font-bold">
                         ↑ Engine priority
                       </span>
                     )}
                     <span
-                      className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider ${
+                      className={`inline-block rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider ${
                         nearExpiry
                           ? "bg-blood text-white animate-pulse"
                           : "bg-ink-5 text-ink-60 border border-ink-10"
@@ -477,7 +477,7 @@ export default function BankPage() {
 
       {/* Info footer box */}
       <div className="mt-12 card-2xl border-ink-10 bg-white p-6">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-ink-40">System note</p>
+        <p className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">System note</p>
         <p className="mt-2 text-xs text-ink-60 leading-relaxed">
           Inventory expiration tracking runs as a cron schedule. Low shelf-life units are automatically prioritized by the scoring algorithm to prevent precious resources from going to waste.
         </p>
