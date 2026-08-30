@@ -26,6 +26,14 @@ const CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
   noida: { lat: 28.5355, lng: 77.391 },
   gurugram: { lat: 28.4595, lng: 77.0266 },
   gurgaon: { lat: 28.4595, lng: 77.0266 },
+  punjab: { lat: 31.1471, lng: 75.3412 },
+  ludhiana: { lat: 30.9010, lng: 75.8573 },
+  amritsar: { lat: 31.6340, lng: 74.8723 },
+  jalandhar: { lat: 31.3260, lng: 75.5762 },
+  patiala: { lat: 30.3398, lng: 76.3869 },
+  bathinda: { lat: 30.2110, lng: 74.9455 },
+  mohali: { lat: 30.7046, lng: 76.7179 },
+  haryana: { lat: 29.0588, lng: 76.0856 },
   mumbai: { lat: 19.076, lng: 72.8777 },
   lilavati: { lat: 19.0519, lng: 72.8291 },
   bengaluru: { lat: 12.9716, lng: 77.5946 },
@@ -156,12 +164,26 @@ export default function EmergencyPage() {
       else detectedUnits = parseInt(val, 10) || null;
     }
 
-    // Common hospital/city names in speech
+    // 1. Natural location extraction patterns (e.g. "location is Punjab", "in Ludhiana", "at AIIMS", "from Delhi")
+    const locPattern = /(?:location is|located at|located in|in|at|near|from|city is|place is)\s+([a-zA-Z\s]+?)(?:\.|$|,|\band\b|\bwith\b|\bneed\b|\bunits?\b|\bblood\b|\bgroup\b)/i;
+    const locMatch = lower.match(locPattern);
+    if (locMatch && locMatch[1]) {
+      const candidate = locMatch[1].trim();
+      const forbidden = ["o", "a", "b", "ab", "positive", "negative", "unit", "units", "blood", "group", "emergency"];
+      if (candidate.length > 2 && !forbidden.includes(candidate.toLowerCase())) {
+        detectedLoc = candidate.charAt(0).toUpperCase() + candidate.slice(1);
+      }
+    }
+
+    // 2. Comprehensive Indian States, Hospitals, and Cities fallback list
     const knownLocations = [
-      "AIIMS", "Safdarjung", "Max", "Apollo", "Fortis", "Medanta", 
-      "Delhi", "Noida", "Gurugram", "Gurgaon", "Mumbai", "Bangalore", 
-      "Bengaluru", "Hyderabad", "Kolkata", "Chennai", "Pune", "Jaipur", 
-      "Rohini", "Dwarka", "Saket", "Janakpuri", "Lajpat Nagar"
+      "Punjab", "Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Mohali", 
+      "Haryana", "Chandigarh", "Panipat", "Karnal", "Rohtak", "Faridabad", "Gurugram", "Gurgaon",
+      "AIIMS", "Safdarjung", "Max", "Apollo", "Fortis", "Medanta", "Lilavati", "Ganga Ram",
+      "Delhi", "New Delhi", "Noida", "Greater Noida", "Ghaziabad", "Meerut", "Agra", "Kanpur", "Lucknow", "Varanasi",
+      "Mumbai", "Pune", "Nagpur", "Bangalore", "Bengaluru", "Hyderabad", "Chennai", "Kolkata", 
+      "Jaipur", "Ahmedabad", "Surat", "Indore", "Bhopal", "Patna", "Ranchi", "Bhubaneswar", "Dehradun",
+      "Rohini", "Dwarka", "Saket", "Janakpuri", "Lajpat Nagar", "Connaught Place", "Karol Bagh", "Vasant Kunj"
     ];
     for (const loc of knownLocations) {
       if (lower.includes(loc.toLowerCase())) {
@@ -560,14 +582,26 @@ export default function EmergencyPage() {
             >
               🎙️ "3 units A- in Safdarjung"
             </button>
-            <button
-              type="button"
-              onClick={() => simulateVoicePrompt("B positive 1 unit blood needed in Fortis Hospital Noida")}
-              className="px-2.5 py-1 rounded-lg bg-white border border-ink-10 text-ink-60 hover:bg-blood hover:text-white text-xs font-medium transition-colors shadow-2xs"
-            >
-              🎙️ "1 unit B+ in Fortis Noida"
-            </button>
           </div>
+
+          {voiceTranscript && (
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-red-100/60 border border-blood/25 animate-fade-slide-up">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-blood animate-ping" />
+                <span className="font-mono text-xs font-bold text-ink">
+                  Voice Ready: <span className="text-blood font-extrabold">{unitsNeeded} Units · {bloodGroup}</span> near <span className="text-ink font-semibold">{locationInput || selectedLocation.label.split(',')[0]}</span>
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl bg-blood hover:bg-blood-light text-white font-mono text-xs font-bold shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-1.5"
+              >
+                {loading ? "🔍 Scanning…" : "🩸 Find Matches Now →"}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Form card */}
