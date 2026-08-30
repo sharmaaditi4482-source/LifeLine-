@@ -192,20 +192,42 @@ export default function EmergencyPage() {
     if (feedbacks.length > 0) {
       setVoiceFeedback(`✓ Auto-filled: ${feedbacks.join(" · ")}`);
     } else {
-      setVoiceFeedback(`Captured: "${text}" — Speak blood group e.g. "O positive" or location`);
+      setVoiceFeedback(`Captured: "${text}"`);
     }
+  };
+
+  const recognitionRef = useRef<any>(null);
+
+  const simulateVoicePrompt = (sampleText: string) => {
+    setIsListening(true);
+    setVoiceTranscript(sampleText);
+    setVoiceFeedback(`🎙️ Processing voice input: "${sampleText}"...`);
+    setTimeout(() => {
+      parseVoiceInput(sampleText);
+      setIsListening(false);
+    }, 600);
   };
 
   const handleVoiceSOS = () => {
     if (typeof window === "undefined") return;
+
+    if (isListening && recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      setIsListening(false);
+      return;
+    }
+
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      setVoiceFeedback("Voice speech recognition not supported in this browser. Please type directly.");
+      setVoiceFeedback("Web Speech API not enabled in this browser. Try the 1-Click Voice simulation buttons below!");
       return;
     }
 
     try {
       const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
       recognition.lang = "en-IN";
       recognition.continuous = false;
       recognition.interimResults = true;
@@ -217,18 +239,22 @@ export default function EmergencyPage() {
       };
 
       recognition.onresult = (event: any) => {
-        const transcript = Array.from(event.results)
-          .map((result: any) => result[0].transcript)
-          .join("");
-        setVoiceTranscript(transcript);
-        if (event.results[0].isFinal) {
-          parseVoiceInput(transcript);
+        let fullTranscript = "";
+        for (let i = 0; i < event.results.length; i++) {
+          fullTranscript += event.results[i][0].transcript + " ";
         }
+        fullTranscript = fullTranscript.trim();
+        setVoiceTranscript(fullTranscript);
+        parseVoiceInput(fullTranscript);
       };
 
       recognition.onerror = (event: any) => {
         setIsListening(false);
-        setVoiceFeedback(`Voice recognition ended (${event.error || "No speech detected"})`);
+        if (event.error === "not-allowed" || event.error === "permission-denied") {
+          setVoiceFeedback("Mic permission denied. Allow mic or use Quick Voice Prompts below.");
+        } else {
+          setVoiceFeedback(`Mic ended (${event.error || "No audio detected"}). Try Quick Voice Prompts.`);
+        }
       };
 
       recognition.onend = () => {
@@ -238,7 +264,7 @@ export default function EmergencyPage() {
       recognition.start();
     } catch {
       setIsListening(false);
-      setVoiceFeedback("Could not access microphone. Please allow microphone permissions.");
+      setVoiceFeedback("Microphone access blocked. Use Quick Voice Prompts below.");
     }
   };
 
@@ -516,6 +542,32 @@ export default function EmergencyPage() {
               <span className="italic font-semibold text-blood">"{voiceTranscript}"</span>
             </div>
           )}
+
+          {/* Quick Simulated Voice Prompts for 100% Reliable Demo */}
+          <div className="mt-3 pt-2.5 border-t border-ink-10/60 flex flex-wrap items-center gap-1.5 text-xs font-mono">
+            <span className="text-ink-40 text-[10px] uppercase font-bold">⚡ Try Voice Prompts:</span>
+            <button
+              type="button"
+              onClick={() => simulateVoicePrompt("Need 2 units O positive at AIIMS Delhi")}
+              className="px-2.5 py-1 rounded-lg bg-white border border-blood/20 text-blood hover:bg-blood hover:text-white text-xs font-medium transition-colors shadow-2xs"
+            >
+              🎙️ "2 units O+ at AIIMS"
+            </button>
+            <button
+              type="button"
+              onClick={() => simulateVoicePrompt("Urgent 3 units A negative blood in Safdarjung")}
+              className="px-2.5 py-1 rounded-lg bg-white border border-ink-10 text-ink-60 hover:bg-blood hover:text-white text-xs font-medium transition-colors shadow-2xs"
+            >
+              🎙️ "3 units A- in Safdarjung"
+            </button>
+            <button
+              type="button"
+              onClick={() => simulateVoicePrompt("B positive 1 unit blood needed in Fortis Hospital Noida")}
+              className="px-2.5 py-1 rounded-lg bg-white border border-ink-10 text-ink-60 hover:bg-blood hover:text-white text-xs font-medium transition-colors shadow-2xs"
+            >
+              🎙️ "1 unit B+ in Fortis Noida"
+            </button>
+          </div>
         </div>
 
         {/* Form card */}
