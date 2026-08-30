@@ -187,6 +187,6 @@ Open [http://localhost:3000](http://localhost:3000) to view the application loca
 <div align="center">
 
 **LifeLine — Saving Lives in Seconds.**  
-Built for Round 3 Prototype Evaluation.
+
 
 </div>
