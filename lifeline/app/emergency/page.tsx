@@ -124,6 +124,124 @@ export default function EmergencyPage() {
     return resolveLocation(query, selectedLocation);
   }
 
+  const [isListening, setIsListening] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState("");
+  const [voiceFeedback, setVoiceFeedback] = useState("");
+
+  const parseVoiceInput = (text: string) => {
+    const lower = text.toLowerCase();
+    let detectedBg: BloodGroup | null = null;
+    let detectedUnits: number | null = null;
+    let detectedLoc: string | null = null;
+
+    // Blood groups regex & keyword matching
+    if (lower.includes("ab positive") || lower.includes("ab+") || lower.includes("ab plus") || lower.includes("एबी पॉजिटिव")) detectedBg = "AB+";
+    else if (lower.includes("ab negative") || lower.includes("ab-") || lower.includes("ab minus") || lower.includes("एबी नेगेटिव")) detectedBg = "AB-";
+    else if (lower.includes("o positive") || lower.includes("o+") || lower.includes("o plus") || lower.includes("ओ पॉजिटिव")) detectedBg = "O+";
+    else if (lower.includes("o negative") || lower.includes("o-") || lower.includes("o minus") || lower.includes("ओ नेगेटिव")) detectedBg = "O-";
+    else if (lower.includes("a positive") || lower.includes("a+") || lower.includes("a plus") || lower.includes("ए पॉजिटिव")) detectedBg = "A+";
+    else if (lower.includes("a negative") || lower.includes("a-") || lower.includes("a minus") || lower.includes("ए नेगेटिव")) detectedBg = "A-";
+    else if (lower.includes("b positive") || lower.includes("b+") || lower.includes("b plus") || lower.includes("बी पॉजिटिव")) detectedBg = "B+";
+    else if (lower.includes("b negative") || lower.includes("b-") || lower.includes("b minus") || lower.includes("बी नेगेटिव")) detectedBg = "B-";
+
+    // Units matching
+    const unitMatch = lower.match(/(\d+)\s*(unit|units|यूनिट|bag|bags|bottles?)/i) || lower.match(/(one|two|three|four|five|ek|do|teen|char)\s*(unit|units|यूनिट|bag|bags)/i);
+    if (unitMatch) {
+      const val = unitMatch[1].toLowerCase();
+      if (val === "one" || val === "ek") detectedUnits = 1;
+      else if (val === "two" || val === "do") detectedUnits = 2;
+      else if (val === "three" || val === "teen") detectedUnits = 3;
+      else if (val === "four" || val === "char") detectedUnits = 4;
+      else if (val === "five") detectedUnits = 5;
+      else detectedUnits = parseInt(val, 10) || null;
+    }
+
+    // Common hospital/city names in speech
+    const knownLocations = [
+      "AIIMS", "Safdarjung", "Max", "Apollo", "Fortis", "Medanta", 
+      "Delhi", "Noida", "Gurugram", "Gurgaon", "Mumbai", "Bangalore", 
+      "Bengaluru", "Hyderabad", "Kolkata", "Chennai", "Pune", "Jaipur", 
+      "Rohini", "Dwarka", "Saket", "Janakpuri", "Lajpat Nagar"
+    ];
+    for (const loc of knownLocations) {
+      if (lower.includes(loc.toLowerCase())) {
+        detectedLoc = loc;
+        break;
+      }
+    }
+
+    const feedbacks = [];
+    if (detectedBg) {
+      setBloodGroup(detectedBg);
+      feedbacks.push(`Blood Group: ${detectedBg}`);
+    }
+    if (detectedUnits && detectedUnits > 0) {
+      setUnitsNeeded(detectedUnits);
+      feedbacks.push(`Units: ${detectedUnits}`);
+    }
+    if (detectedLoc) {
+      setLocationInput(detectedLoc);
+      geocodeLocation(detectedLoc).then((locObj) => {
+        setSelectedLocation(locObj);
+        setLocationStatus(`${locObj.lat.toFixed(4)}, ${locObj.lng.toFixed(4)}`);
+        setGpsState("locked");
+      });
+      feedbacks.push(`Location: ${detectedLoc}`);
+    }
+
+    if (feedbacks.length > 0) {
+      setVoiceFeedback(`✓ Auto-filled: ${feedbacks.join(" · ")}`);
+    } else {
+      setVoiceFeedback(`Captured: "${text}" — Speak blood group e.g. "O positive" or location`);
+    }
+  };
+
+  const handleVoiceSOS = () => {
+    if (typeof window === "undefined") return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceFeedback("Voice speech recognition not supported in this browser. Please type directly.");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-IN";
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setVoiceTranscript("");
+        setVoiceFeedback("🎙️ Listening... (Say e.g. 'Need 2 units O positive at AIIMS')");
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join("");
+        setVoiceTranscript(transcript);
+        if (event.results[0].isFinal) {
+          parseVoiceInput(transcript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        setIsListening(false);
+        setVoiceFeedback(`Voice recognition ended (${event.error || "No speech detected"})`);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      setVoiceFeedback("Could not access microphone. Please allow microphone permissions.");
+    }
+  };
+
   function handleDetectGPS() {
     setGpsState("detecting");
     setLocationStatus("Detecting…");
@@ -338,6 +456,66 @@ export default function EmergencyPage() {
               Safdarjung (O- Critical)
             </button>
           </div>
+        </div>
+
+        {/* 🎙️ Voice SOS Assistant Panel */}
+        <div className="mb-5 rounded-2xl border-2 border-dashed border-blood/20 bg-gradient-to-r from-red-50/70 via-white to-red-50/70 p-4 transition-all shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleVoiceSOS}
+                className={`relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-white shadow-md transition-all active:scale-95 ${
+                  isListening
+                    ? "bg-red-600 animate-pulse ring-4 ring-red-300"
+                    : "bg-blood hover:bg-blood-light"
+                }`}
+                title="Click to speak your emergency blood request"
+              >
+                {isListening ? (
+                  <span className="h-4 w-4 rounded-full bg-white animate-ping" />
+                ) : (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                )}
+              </button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-display text-sm font-bold text-ink">
+                    🎙️ Voice Emergency Dispatcher (Hands-Free)
+                  </h3>
+                  {isListening && (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 font-mono text-[10px] font-bold text-blood animate-pulse">
+                      LIVE LISTENING
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-ink-60 mt-0.5">
+                  {voiceFeedback || 'Tap mic and say: "Need 2 units O positive at AIIMS"'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleVoiceSOS}
+              className={`rounded-xl px-4 py-2 font-mono text-xs font-bold transition-all shadow-xs flex-shrink-0 ${
+                isListening
+                  ? "bg-blood text-white shadow-sm"
+                  : "border border-blood/30 bg-white text-blood hover:bg-red-50"
+              }`}
+            >
+              {isListening ? "Listening…" : "Speak Emergency"}
+            </button>
+          </div>
+
+          {voiceTranscript && (
+            <div className="mt-2.5 rounded-xl bg-white/90 border border-ink-10 px-3 py-2 text-xs font-mono text-ink">
+              <span className="text-ink-40 font-bold uppercase tracking-wider text-[10px]">Speech Heard: </span>
+              <span className="italic font-semibold text-blood">"{voiceTranscript}"</span>
+            </div>
+          )}
         </div>
 
         {/* Form card */}
