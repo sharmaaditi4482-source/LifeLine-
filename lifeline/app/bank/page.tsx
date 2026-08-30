@@ -15,7 +15,7 @@ export default function BankPage() {
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.push("/login");
+        router.push("/login?role=bank");
       } else {
         setAuthChecking(false);
       }

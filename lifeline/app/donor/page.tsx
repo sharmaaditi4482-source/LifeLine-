@@ -19,7 +19,7 @@ export default function DonorPage() {
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.push("/login");
+        router.push("/login?role=donor");
       } else {
         setAuthChecking(false);
       }

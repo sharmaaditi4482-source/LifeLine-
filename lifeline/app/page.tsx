@@ -228,6 +228,9 @@ export default function Home() {
             <Link href="/donor" className="hover:text-blood transition-colors">
               {t("nav_for_donors")}
             </Link>
+            <Link href="/bank" className="hover:text-blood transition-colors">
+              🏦 Blood Banks
+            </Link>
             <a href="#system-modules" onClick={(e) => handleSmoothScroll(e, "system-modules")} className="hover:text-blood transition-colors">
               {t("nav_about_us")}
             </a>

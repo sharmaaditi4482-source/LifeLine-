@@ -96,7 +96,7 @@ export default function HospitalDashboard() {
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.push("/login");
+        router.push("/login?role=hospital");
       } else {
         setAuthChecking(false);
       }

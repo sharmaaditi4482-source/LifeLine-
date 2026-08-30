@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
@@ -10,12 +10,33 @@ type UserRole = "hospital" | "donor" | "bank";
 export default function LoginPage() {
   const router = useRouter();
   const [role, setRole] = useState<UserRole>("hospital");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("trauma.desk@aiims.edu");
+  const [password, setPassword] = useState("emergency2026");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errorText, setErrorText] = useState("");
+
+  // Check URL query param ?role=donor | bank | hospital on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const queryRole = params.get("role") as UserRole;
+      if (queryRole && ["hospital", "donor", "bank"].includes(queryRole)) {
+        setRole(queryRole);
+        if (queryRole === "donor") {
+          setEmail("rahul.verma@lifeline.org");
+          setPassword("donorhero2026");
+        } else if (queryRole === "bank") {
+          setEmail("inventory@redcross.org");
+          setPassword("bloodbank2026");
+        } else {
+          setEmail("trauma.desk@aiims.edu");
+          setPassword("emergency2026");
+        }
+      }
+    }
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -353,9 +374,9 @@ export default function LoginPage() {
 
               <Link
                 href="/"
-                className="font-mono text-xs uppercase tracking-widest text-ink-40 hover:text-ink transition-colors"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-ink-5 hover:bg-ink-10 text-ink font-mono text-xs font-bold transition-all border border-ink-10 shadow-sm hover:border-ink/40"
               >
-                ← Back
+                ← Back to Home
               </Link>
             </div>
 
