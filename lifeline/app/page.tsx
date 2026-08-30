@@ -399,7 +399,7 @@ export default function Home() {
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
-                href="/emergency"
+                href="/hospital"
                 className="flex items-center gap-2 rounded-2xl bg-blood px-6 py-3.5 font-display text-sm font-semibold text-white transition-all hover:bg-blood-light shadow-md hover:shadow-lg"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -729,7 +729,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap justify-center gap-4 pt-2">
                 <Link
-                  href="/emergency"
+                  href="/hospital"
                   className="rounded-2xl bg-blood border border-blood px-7 py-3.5 font-display text-sm font-semibold text-white transition-all hover:bg-blood-light shadow-md hover:shadow-lg"
                 >
                   Request Blood
