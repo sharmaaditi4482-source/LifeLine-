@@ -399,7 +399,7 @@ export default function Home() {
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
-                href="/hospital"
+                href="/emergency"
                 className="flex items-center gap-2 rounded-2xl bg-blood px-6 py-3.5 font-display text-sm font-semibold text-white transition-all hover:bg-blood-light shadow-md hover:shadow-lg"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -707,48 +707,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── 7. DARK NETWORK CARD ── */}
-        <section className="reveal-item">
-          <div className="rounded-3xl border border-red-950/40 bg-gradient-to-br from-[#1F0707] via-[#140404] to-[#0A0202] text-white p-8 md:p-12 relative overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
-              <svg width="100%" height="100%">
-                <pattern id="dark-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="1" />
-                </pattern>
-                <rect width="100%" height="100%" fill="url(#dark-grid)" />
-              </svg>
-            </div>
-            <div className="relative z-10 max-w-xl space-y-4">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-red-400 bg-red-950/80 border border-red-800/40 px-3 py-1 rounded-full">
-                SECURE DEPLOYMENT
-              </span>
-              <h2 className="font-display text-3xl font-semibold text-white sm:text-4xl leading-tight">
-                A live network for a system that cannot afford delays.
-              </h2>
-              <p className="text-sm text-white/70 leading-relaxed">
-                Connects supply registries across public, private, and district health networks to automate resource matching in real-time.
-              </p>
-            </div>
-            <div className="relative z-10 mt-10 grid gap-4 grid-cols-2 md:grid-cols-4 pt-8 border-t border-white/10">
-              {[
-                { label: "CONNECTED SUPPLY LAYERS", value: "3 Layers" },
-                { label: "GPS SHIELD RADAR", value: "Real-time alerts" },
-                { label: "EXPIRATION PRIORITY", value: "Expiry-aware" },
-                { label: "AUTO ROUTING STATUS", value: "Automated lock" },
-              ].map((m, idx) => (
-                <div key={idx} className="space-y-1">
-                  <p className="font-mono text-xs text-red-400 uppercase font-bold tracking-wider">{m.value}</p>
-                  <p className="font-mono text-[9px] text-white/50 uppercase tracking-widest leading-normal">{m.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── 8. FEATURE GRID ── */}
+        {/* ── 7. FEATURE HIGHLIGHTS ── */}
         <FeatureGrid />
 
-        {/* ── 9. FINAL CTA ── */}
+        {/* ── 8. FINAL CLEAN CALL TO ACTION ── */}
         <section className="reveal-item text-center py-6">
           <div className="rounded-3xl border border-red-200 bg-gradient-to-b from-red-50 to-[#FAF7F2] p-8 md:p-14 relative overflow-hidden max-w-3xl mx-auto shadow-sm">
             <span className="absolute -top-12 -left-12 w-32 h-32 rounded-full bg-red-200/50 animate-ping opacity-30 pointer-events-none" />
@@ -767,7 +729,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap justify-center gap-4 pt-2">
                 <Link
-                  href="/hospital"
+                  href="/emergency"
                   className="rounded-2xl bg-blood border border-blood px-7 py-3.5 font-display text-sm font-semibold text-white transition-all hover:bg-blood-light shadow-md hover:shadow-lg"
                 >
                   Request Blood

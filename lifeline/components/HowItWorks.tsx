@@ -18,29 +18,29 @@ export default function HowItWorks({ handleSmoothScroll }: HowItWorksProps) {
   const steps = [
     {
       step: "01",
-      badge: isHindi ? "मांग प्रविष्टि" : "DEMAND INGESTION",
-      title: isHindi ? "अस्पताल का तत्काल अनुरोध" : "Hospital Raises Request",
+      badge: isHindi ? "चरण 1" : "STEP 1",
+      title: isHindi ? "रक्त का तत्काल अनुरोध" : "Request Blood",
       desc: isHindi
-        ? "अस्पताल आवश्यक रक्त समूह, यूनिट्स और गंभीरता दर्ज करते हैं। लाइव GPS स्थान तुरंत लॉक हो जाता है।"
-        : "Hospital desks input recipient blood group, units needed, and urgency. Live GPS coordinates are automatically locked.",
+        ? "रक्त समूह और स्थान चुनें। GPS से निकटतम केंद्र तुरंत पहचाने जाते हैं।"
+        : "Select required blood group and urgency. GPS locates nearby facilities instantly.",
       icon: "🏥",
     },
     {
       step: "02",
-      badge: isHindi ? "स्मार्ट सॉर्टिंग" : "AUTONOMOUS SORTING",
-      title: isHindi ? "एल्गोरिदम स्कोरिंग" : "Engine Runs Scoring",
+      badge: isHindi ? "चरण 2" : "STEP 2",
+      title: isHindi ? "स्मार्ट लाइव मैचिंग" : "Smart Matching",
       desc: isHindi
-        ? "ABO/Rh जैविक सुरक्षा के बाद निकटता (30%), गंभीरता (35%), समाप्ति (20%) और विश्वसनीयता (15%) से सर्वश्रेष्ठ विकल्प रैंक होते हैं।"
-        : "LifeLine applies hard ABO/Rh biological filters first, then ranks candidates by Proximity (30%), Urgency (35%), Expiry (20%), and Reliability (15%).",
+        ? "एल्गोरिदम दूरी, समय और उपलब्धता के आधार पर सर्वश्रेष्ठ विकल्प रैंक करता है।"
+        : "Scoring algorithm ranks verified donors and blood banks within 50 km in seconds.",
       icon: "⚡",
     },
     {
       step: "03",
-      badge: isHindi ? "सुरक्षित आरक्षण" : "ATOMIC RESERVATION",
-      title: isHindi ? "प्रथम-पुष्टि लॉक" : "First-Confirmed Lock",
+      badge: isHindi ? "चरण 3" : "STEP 3",
+      title: isHindi ? "सुरक्षित पुष्टि व लॉक" : "Confirm & Deliver",
       desc: isHindi
-        ? "शीर्ष रैंक वाले रक्तदाता को तुरंत अलर्ट भेजा जाता है। पुष्टि होते ही यूनिट लॉक हो जाती है और शेष उम्मीदवार पुनः उपलब्ध हो जाते हैं।"
-        : "The top-ranked donor or bank is dispatched immediately. Once confirmed, the unit is locked and all secondary candidates are released.",
+        ? "पुष्टि होते ही यूनिट लॉक हो जाती है और लाइव रूट ट्रैकिंग शुरू हो जाती है।"
+        : "First confirmed unit is locked atomically to prevent duplicate booking.",
       icon: "🔒",
     },
   ];
