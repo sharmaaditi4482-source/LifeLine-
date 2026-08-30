@@ -416,6 +416,12 @@ export default function Home() {
               >
                 <span>🙋</span> {t("hero_cta_donor")}
               </Link>
+              <Link
+                href="/bank"
+                className="flex items-center gap-2 rounded-2xl border border-ink-10 bg-white px-6 py-3.5 font-display text-sm font-semibold text-ink transition-all hover:border-ink shadow-sm"
+              >
+                <span>🏦</span> {t("hero_cta_bank")}
+              </Link>
             </div>
 
             {/* Trust Badges */}
