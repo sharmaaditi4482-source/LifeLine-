@@ -39,6 +39,13 @@ export default function BankPage() {
   const [unitsInput, setUnitsInput] = useState(5);
   const [expiryDaysInput, setExpiryDaysInput] = useState(25);
   const [locationLabelInput, setLocationLabelInput] = useState("South Extension, Delhi");
+  const [bankLocation, setBankLocation] = useState<{ lat: number; lng: number; label: string }>({
+    lat: 28.5672,
+    lng: 77.2100,
+    label: "South Extension, Delhi",
+  });
+  const [gpsDetecting, setGpsDetecting] = useState(false);
+  const [gpsStatus, setGpsStatus] = useState("");
   const [addLoading, setAddLoading] = useState(false);
   const [addSuccess, setAddSuccess] = useState(false);
 
@@ -53,8 +60,47 @@ export default function BankPage() {
       .catch(() => setLoading(false));
   };
 
+  const handleDetectGPS = () => {
+    if (!navigator.geolocation) {
+      setGpsStatus("GPS not supported by browser");
+      return;
+    }
+    setGpsDetecting(true);
+    setGpsStatus("Detecting live GPS...");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const label = `Current Device GPS (${lat.toFixed(3)}, ${lng.toFixed(3)})`;
+        setBankLocation({ lat, lng, label });
+        setLocationLabelInput(label);
+        setGpsStatus(`✓ Live Device GPS Locked: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+        setGpsDetecting(false);
+      },
+      () => {
+        setGpsStatus("GPS permission denied. Enter location manually.");
+        setGpsDetecting(false);
+      },
+      { timeout: 8000 }
+    );
+  };
+
   useEffect(() => {
     fetchUnits();
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const label = `Current Device GPS (${lat.toFixed(3)}, ${lng.toFixed(3)})`;
+          setBankLocation({ lat, lng, label });
+          setLocationLabelInput(label);
+          setGpsStatus(`✓ Live Device GPS Auto-Detected: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+        },
+        () => {},
+        { timeout: 6000 }
+      );
+    }
   }, []);
 
   async function handleAddStock(e: React.FormEvent) {
@@ -70,8 +116,8 @@ export default function BankPage() {
           unitsAvailable: unitsInput,
           expiryDays: expiryDaysInput,
           location: {
-            lat: 28.5672,
-            lng: 77.2100,
+            lat: bankLocation.lat,
+            lng: bankLocation.lng,
             label: locationLabelInput,
           },
         }),
@@ -256,9 +302,19 @@ export default function BankPage() {
                 </div>
 
                 <div>
-                  <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
-                    City / Facility Location *
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="font-mono text-xs font-semibold uppercase tracking-widest text-ink-60">
+                      City / Facility Location *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleDetectGPS}
+                      disabled={gpsDetecting}
+                      className="font-mono text-xs text-blood hover:underline font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      {gpsDetecting ? "⏳ Locating..." : "📍 Use Live GPS"}
+                    </button>
+                  </div>
                   <input
                     required
                     value={locationLabelInput}
@@ -266,6 +322,11 @@ export default function BankPage() {
                     placeholder="e.g. Connaught Place, Central Delhi"
                     className="mt-1.5 w-full rounded-xl border border-ink-10 bg-white px-4 py-2.5 text-sm text-ink transition focus:border-blood shadow-xs"
                   />
+                  {gpsStatus && (
+                    <p className="mt-1 font-mono text-xs text-green-700 font-medium">
+                      {gpsStatus}
+                    </p>
+                  )}
                 </div>
 
                 <button

@@ -22,10 +22,10 @@ Evaluators can test all role-gated portals with pre-provisioned demo accounts or
 
 | Portal | Live Route | Demo Email | Demo Password | Key Features to Test |
 |---|---|---|---|---|
-| 🚨 **Emergency SOS (Zero-Auth)** | [`/emergency`](https://lifeline-aditi.vercel.app/emergency) | *No Login Required* | *Instant SOS* | **🎙️ Hands-Free Voice Dispatcher**, 1-Click Voice Prompts, GPS auto-detect, 50km radius match, live route map |
-| 🏥 **Hospital Command Desk** | [`/hospital`](https://lifeline-aditi.vercel.app/hospital) | `trauma.desk@aiims.edu` | `emergency2026` | Real-time stock audit, 48h shortage forecasting, donor dispatch |
-| 🩸 **Donor Volunteer Portal** | [`/donor`](https://lifeline-aditi.vercel.app/donor) | `rahul.verma@lifeline.org` | `donorhero2026` | 90-day cooldown countdown, lives saved tiers, availability toggle |
-| 🏦 **Blood Bank Reserve Hub** | [`/bank`](https://lifeline-aditi.vercel.app/bank) | `inventory@redcross.org` | `bloodbank2026` | 1-click stock update pill modal, near-expiry monitor, hospital search |
+| 🚨 **Emergency SOS (Zero-Auth)** | [`/emergency`](https://lifeline-aditi.vercel.app/emergency) | *No Login Required* | *Instant SOS* | **🎙️ Hands-Free Voice Dispatcher**, 1-Click Voice Prompts, **Live GPS Auto-Detect**, 50km radius match, live route map |
+| 🏥 **Hospital Command Desk** | [`/hospital`](https://lifeline-aditi.vercel.app/hospital) | `trauma.desk@aiims.edu` | `emergency2026` | **Live GPS Auto-Detect**, Real-time stock audit, 48h shortage forecasting, donor dispatch |
+| 🩸 **Donor Volunteer Portal** | [`/donor`](https://lifeline-aditi.vercel.app/donor) | `rahul.verma@lifeline.org` | `donorhero2026` | **Live GPS Auto-Detect & Distance Sorting**, 90-day cooldown countdown, lives saved tiers, availability toggle |
+| 🏦 **Blood Bank Reserve Hub** | [`/bank`](https://lifeline-aditi.vercel.app/bank) | `inventory@redcross.org` | `bloodbank2026` | **Live GPS Auto-Pinning**, 1-click stock update modal, near-expiry monitor, hospital search |
 | 📊 **Regional Analytics** | [`/analytics`](https://lifeline-aditi.vercel.app/analytics) | *Public Telemetry* | — | 7-day demand volume, ABO supply vs demand charts, live event bus |
 
 ---

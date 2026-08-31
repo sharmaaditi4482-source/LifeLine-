@@ -78,11 +78,11 @@ export default function DonorPage() {
         (pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          setUserGpsLocation({
-            lat,
-            lng,
-            label: `My GPS (${lat.toFixed(3)}, ${lng.toFixed(3)})`,
-          });
+          const label = `Current Device GPS (${lat.toFixed(3)}, ${lng.toFixed(3)})`;
+          setUserGpsLocation({ lat, lng, label });
+          setRegLocation({ lat, lng, label });
+          setRegAreaInput(label);
+          setGpsStatus(`✓ Live Device GPS Auto-Detected: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
         },
         () => {},
         { timeout: 6000 }
