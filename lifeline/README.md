@@ -22,7 +22,7 @@ Evaluators can test all role-gated portals with pre-provisioned demo accounts or
 
 | Portal | Live Route | Demo Email | Demo Password | Key Features to Test |
 |---|---|---|---|---|
-| 🚨 **Emergency SOS (Zero-Auth)** | [`/emergency`](https://lifeline-aditi.vercel.app/emergency) | *No Login Required* | *Instant SOS* | GPS auto-detect, 50km radius match, live ambulance route map |
+| 🚨 **Emergency SOS (Zero-Auth)** | [`/emergency`](https://lifeline-aditi.vercel.app/emergency) | *No Login Required* | *Instant SOS* | **🎙️ Hands-Free Voice Dispatcher**, 1-Click Voice Prompts, GPS auto-detect, 50km radius match, live route map |
 | 🏥 **Hospital Command Desk** | [`/hospital`](https://lifeline-aditi.vercel.app/hospital) | `trauma.desk@aiims.edu` | `emergency2026` | Real-time stock audit, 48h shortage forecasting, donor dispatch |
 | 🩸 **Donor Volunteer Portal** | [`/donor`](https://lifeline-aditi.vercel.app/donor) | `rahul.verma@lifeline.org` | `donorhero2026` | 90-day cooldown countdown, lives saved tiers, availability toggle |
 | 🏦 **Blood Bank Reserve Hub** | [`/bank`](https://lifeline-aditi.vercel.app/bank) | `inventory@redcross.org` | `bloodbank2026` | 1-click stock update pill modal, near-expiry monitor, hospital search |
@@ -143,6 +143,7 @@ npx tsx scripts/verify.ts
 ## ✨ Standout Platform Features
 
 - **🚨 Zero-Auth SOS Gateway (`/emergency`):** One-tap emergency dispatch with automatic HTML5 Geolocation capture, interactive Leaflet route visualization, and estimated ambulance transit times.
+- **🎙️ Hands-Free Voice Emergency Dispatcher (`/emergency`):** Built-in client-side Web Speech Recognition API (`en-IN` & Hindi accent aware) with an intelligent Natural Language Entity Extractor that parses spoken blood types (`"O positive"`, `"A-"`), unit quantities, and regional locations (`"Punjab"`, `"AIIMS"`, `"Delhi"`) into real-time geocoded coordinates, complete with 1-click fail-safe voice prompt simulation chips and instant dispatch fast-tracking.
 - **🇮🇳 Bilingual Accessibility Toggle (हिंदी / English):** Complete multi-lingual support on all portals, enabling rapid adoption across diverse regional healthcare teams.
 - **🎮 Interactive Algorithm Simulator:** Embedded sandbox allowing evaluators to tune Urgency, Distance, and Expiry sliders to inspect real-time mathematical score recalculations.
 - **📋 Built-in Judge Evaluation Drawer:** Pre-configured 4-scenario testing tool (Mass Casualty, Rare Blood Type, Zero-Stock Outage, Verified Donor Boost) for instant end-to-end verification.
@@ -154,6 +155,7 @@ npx tsx scripts/verify.ts
 ## 🛠️ Tech Stack & Dependencies
 
 - **Frontend & Framework:** Next.js 16 (App Router, Turbopack), React 19, TypeScript (Strict Mode)
+- **Voice & NLP Engine:** Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`), Client-Side Natural Language Entity Extractor
 - **Styling & UI:** Tailwind CSS, Custom Medical Glassmorphic Theme, Lucide Icons
 - **Database & Auth:** Supabase (PostgreSQL), Role-Based JWT Policies
 - **Mapping & Geolocation:** Leaflet, OpenStreetMap, HTML5 Geolocation API
