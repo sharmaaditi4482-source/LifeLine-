@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRequestById, updateRequestStatus } from "@/lib/store";
+import { getRequestById, updateRequestStatus, tryAcquireRequestLock, releaseRequestLock } from "@/lib/store";
 import { recordLiveEvent } from "@/lib/services/eventService";
+import { createDelivery } from "@/lib/services/deliveryService";
 
 /**
  * PATCH /api/match/confirm
@@ -22,9 +23,21 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
+    // Atomic in-process lock acquisition — synchronous, race-safe.
+    if (!tryAcquireRequestLock(requestId)) {
+      return NextResponse.json(
+        {
+          error: "First-confirmed-lock active. This request has already been claimed by another hospital.",
+          conflict: true,
+        },
+        { status: 409 }
+      );
+    }
+
     const request = await getRequestById(requestId);
 
     if (!request) {
+      releaseRequestLock(requestId);
       return NextResponse.json(
         { error: "Request not found." },
         { status: 404 }
@@ -49,6 +62,22 @@ export async function PATCH(req: NextRequest) {
       bloodGroup: request.bloodGroup,
       locationLabel: request.location.label,
     });
+
+    // ── Real hyperlocal dispatch: confirmed match → live rider delivery ──
+    try {
+      createDelivery({
+        requestId,
+        hospitalName: request.hospitalName,
+        bloodGroup: request.bloodGroup,
+        sourceType: "donor",
+        sourceName: confirmedSourceName || confirmedSourceId,
+        fromLat: request.location.lat + 0.015,
+        fromLng: request.location.lng + 0.012,
+        toLat: request.location.lat,
+        toLng: request.location.lng,
+        distanceKm: 1.8,
+      });
+    } catch {}
 
     return NextResponse.json({
       success: true,

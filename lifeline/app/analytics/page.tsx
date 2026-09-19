@@ -15,6 +15,7 @@ import {
   Area,
 } from "recharts";
 import LanguageToggle from "@/components/LanguageToggle";
+import AnalyticsNarrative from "@/components/ai/AnalyticsNarrative";
 
 interface AnalyticsData {
   stats: {
@@ -200,6 +201,21 @@ export default function AnalyticsDashboard() {
           <p className="mt-1 text-xs text-ink-60">Verified donor transfusions</p>
         </div>
       </div>
+
+      {/* ── Gen-AI Regional Narrator ── */}
+      <AnalyticsNarrative
+        payload={{
+          stats: {
+            totalMatches: stats.totalMatches,
+            mostRequestedGroup: stats.mostRequestedGroup,
+            mostRequestedCount: stats.mostRequestedCount,
+            averageMatchResponseTimeSeconds: stats.averageMatchResponseTimeSeconds,
+            totalLivesSaved: stats.totalLivesSaved,
+          },
+          trend: trendData,
+          distribution: distributionData,
+        }}
+      />
 
       {/* ── Charts Row 1: 7-Day Request Trend & Supply vs Demand ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

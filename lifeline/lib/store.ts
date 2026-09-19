@@ -516,6 +516,21 @@ let inMemoryBankUnits: BankInventoryUnit[] = generateBankInventoryUnits(inMemory
 let inMemoryRequests: BloodRequest[] = [];
 let inMemoryRequestHistory: RequestHistoryItem[] = [...SEED_REQUEST_HISTORY];
 
+// ── ATOMIC FIRST-CONFIRMED-LOCK REGISTRY ──
+// Synchronous, in-process gate that guarantees exactly one hospital wins the
+// race for a request — even when PATCH /api/match/confirm arrives concurrently.
+const confirmedLockIds = new Set<string>();
+
+export function tryAcquireRequestLock(id: string): boolean {
+  if (confirmedLockIds.has(id)) return false;
+  confirmedLockIds.add(id);
+  return true;
+}
+
+export function releaseRequestLock(id: string): void {
+  confirmedLockIds.delete(id);
+}
+
 // Fast timeout helper to guarantee sub-second real-time performance
 async function fetchWithTimeout<T>(promise: PromiseLike<T> | Promise<T>, timeoutMs: number = 350): Promise<T> {
   let timeoutHandle: any;

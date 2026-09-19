@@ -6,6 +6,7 @@
 [![Tests Passing](https://img.shields.io/badge/Test%20Suite-39%2F39%20Passed%20(100%25)-brightgreen?style=for-the-badge&logo=vitest&logoColor=white)](https://lifeline-aditi.vercel.app)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16%20App%20Router-black?style=for-the-badge&logo=next.js&logoColor=white)](https://lifeline-aditi.vercel.app)
 [![Supabase](https://img.shields.io/badge/Database-Supabase%20PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
+[![Gemini RAG/LLM](https://img.shields.io/badge/GenAI-Google%20Gemini%20RAG%20%2B%20LLM-blue?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com)
 [![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict%20Mode-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 
 ### 🌐 **Live Production Link:** [https://lifeline-aditi.vercel.app](https://lifeline-aditi.vercel.app)
@@ -27,6 +28,7 @@ Evaluators can test all role-gated portals with pre-provisioned demo accounts or
 | 🩸 **Donor Volunteer Portal** | [`/donor`](https://lifeline-aditi.vercel.app/donor) | `rahul.verma@lifeline.org` | `donorhero2026` | **Live GPS Auto-Detect & Distance Sorting**, 90-day cooldown countdown, lives saved tiers, availability toggle |
 | 🏦 **Blood Bank Reserve Hub** | [`/bank`](https://lifeline-aditi.vercel.app/bank) | `inventory@redcross.org` | `bloodbank2026` | **Live GPS Auto-Pinning**, 1-click stock update modal, near-expiry monitor, hospital search |
 | 📊 **Regional Analytics** | [`/analytics`](https://lifeline-aditi.vercel.app/analytics) | *Public Telemetry* | — | 7-day demand volume, ABO supply vs demand charts, live event bus |
+| 🤖 **AI Medical Copilot** | [`/copilot`](https://lifeline-aditi.vercel.app/copilot) | *Public — No Login* | — | **RAG retrieval**, Gemini-powered grounded answers, citations, 15-medical-chunk corpus, deterministic fallback |
 
 ---
 
@@ -115,6 +117,62 @@ When two hospitals attempt to reserve the same blood unit simultaneously:
 
 ---
 
+## 🤖 Gen-AI, LLM & RAG Capabilities
+
+LifeLine integrates a **Retrieval-Augmented Generation (RAG)** pipeline and four domain-specific LLM-powered features using **Google Gemini** (free AI Studio tier). Every feature degrades gracefully to a deterministic fallback so the platform works offline with zero API configuration.
+
+### Architecture Overview
+
+```
+User Query
+    │
+    ▼
+┌───────────────────────────────────────────┐
+│  Retriever: Gemini Embedding (3072-d)     │
+│  → cosine similarity → top-4 chunks       │
+│  Fallback: keyword overlap scorer         │
+└───────────────────┬───────────────────────┘
+                    │ Retrieved context
+                    ▼
+┌───────────────────────────────────────────┐
+│  Generator: Gemini 3.5 Flash Lite         │
+│  → grounded, citation-backed answer       │
+│  Fallback: deterministic template engine  │
+└───────────────────────────────────────────┘
+```
+
+### 1. 🩺 RAG Medical Copilot (`/copilot`)
+- **15-chunk medical knowledge base**: ABO/Rh compatibility, WHO donor eligibility, 90-day cooldown, transfusion protocols, storage shelf life, India blood-type distribution, privacy/consent, MTP guidelines, screening tests
+- Embeddings via `gemini-embedding-2`, in-memory cosine retrieval, Gemini generation
+- Cites medical sources under every answer
+- Chat UI with 5 pre-built medical questions and live mode indicator
+
+### 2. 🧠 LLM Match Explainer (`POST /api/ai/explain`)
+- Takes any `MatchResult` + 4-vector breakdown → plain-language explanation for hospital staff
+- Identifies the strongest and weakest scoring vectors with exact values
+- Embedded as "🤖 Explain Match" button on every match card in Hospital and Emergency portals
+
+### 3. 📢 Gen-AI Emergency SOS Summarizer (`POST /api/ai/sos-summary`)
+- After a match is confirmed in the `/emergency` portal, generates a **bilingual (English + Hindi/Devanagari) emergency alert**
+- Ready to broadcast to hospital group chats and donor networks
+- Auto-includes: urgency level, blood type, top match score, location
+
+### 4. 💬 Gen-AI Donor Outreach (`POST /api/ai/outreach`)
+- Generates personalized **WhatsApp/SMS-style messages** for volunteer donors
+- Supports English and Hinglish (Hindi in Latin script)
+- Context-aware: includes donor name, blood type, distance, urgency, and request ID
+- Embedded as "💬 AI Donor Message" button on confirmed donor matches
+
+### 5. 📊 Smart Analytics Narrator (`POST /api/ai/analytics-narrative`)
+- Converts raw 7-day regional telemetry into a scannable **INSIGHTS / RISKS / RECOMMENDATIONS** report
+- Identifies vulnerable blood groups, peak demand days, and recommends specific actions (donor drives, escalation tier changes)
+- Available on the `/analytics` dashboard as "Generate AI Insights"
+
+### Zero-Config Fallback
+When no `GEMINI_API_KEY` is set, all five features run deterministic, medically accurate template-based fallbacks. The copilot runs keyword-overlap retrieval + context-cited templates. The platform never breaks.
+
+---
+
 ## 🧪 39/39 Automated Test Verification Suite
 
 The repository includes an automated test harness covering biological compatibility, scoring math, and safety boundaries:
@@ -142,13 +200,52 @@ npx tsx scripts/verify.ts
 
 ## ✨ Standout Platform Features
 
+- **🤖 AI Medical Copilot (`/copilot`):** Full **RAG pipeline** (embedding → cosine retrieval → grounded Gemini generation) over a 15-chunk medical knowledge base, answering ABO/Rh, eligibility, storage, and emergency-protocol questions with citations — works offline via deterministic fallback.
 - **🚨 Zero-Auth SOS Gateway (`/emergency`):** One-tap emergency dispatch with automatic HTML5 Geolocation capture, interactive Leaflet route visualization, and estimated ambulance transit times.
 - **🎙️ Hands-Free Voice Emergency Dispatcher (`/emergency`):** Built-in client-side Web Speech Recognition API (`en-IN` & Hindi accent aware) with an intelligent Natural Language Entity Extractor that parses spoken blood types (`"O positive"`, `"A-"`), unit quantities, and regional locations (`"Punjab"`, `"AIIMS"`, `"Delhi"`) into real-time geocoded coordinates, complete with 1-click fail-safe voice prompt simulation chips and instant dispatch fast-tracking.
 - **🇮🇳 Bilingual Accessibility Toggle (हिंदी / English):** Complete multi-lingual support on all portals, enabling rapid adoption across diverse regional healthcare teams.
 - **🎮 Interactive Algorithm Simulator:** Embedded sandbox allowing evaluators to tune Urgency, Distance, and Expiry sliders to inspect real-time mathematical score recalculations.
 - **📋 Built-in Judge Evaluation Drawer:** Pre-configured 4-scenario testing tool (Mass Casualty, Rare Blood Type, Zero-Stock Outage, Verified Donor Boost) for instant end-to-end verification.
 - **📊 Regional Bio-Analytics (`/analytics`):** Real-time Recharts visualizer tracking 7-day request burn rates, supply vs. demand gaps by blood group, and live event telemetry.
+- **🎬 One-Click Guided Judge Demo (`/demo`):** A scripted, self-running story of one emergency that fires the REAL backend pipeline step-by-step — SOS → 4-factor matching → atomic lock → live Gemini explanation → WhatsApp-style donor broadcast → AI regional narrative — streaming every live API step to an on-screen terminal.
+- **🇮🇳 Live India SOS Network (landing page):** An animated radar grid of India with pulsing city nodes, a live SSE event ticker, donor geolocation radar pins, and network arcs that react to the real-time event bus — zero map tiles, pure SVG.
+- **⚡ LifeLine Realtime Hub (landing page):** A WebSocket broadcast node (`:3001`) with live peer count, per-socket latency, donor presence, and a cross-tab broadcast box that syncs every open device instantly.
+- **📤 AI Donor Broadcast Simulator:** WhatsApp-style chat where the AI Copilot drafts 3 personalized outreach messages via the live Gemini endpoint, then simulated donors reply with ETA confirmations live.
+- **⚔️ First-Confirmed-Lock Race Stress Demo:** Fires 5 concurrent hospital confirms at one request to visually prove atomicity — exactly one `HTTP 200`, four `HTTP 409` — with an arrival-order race lane diagram.
 - **🔒 Role-Based Security:** Strict Supabase JWT authentication guarding hospital stock modifications and donor medical profiles.
+
+---
+
+## ⚡ Real-Time Streaming Layer (SSE + WebSocket)
+
+A push-based realtime layer replaces polling everywhere. One in-process event bus (`lib/services/eventService` on a `globalThis` store — see `lib/services/busStore.ts`) fans every system event out to both SSE clients and WebSocket clients simultaneously.
+
+```
+recordLiveEvent(...) ──► event bus (busStore)
+                            ├─► GET /api/events/stream   (SSE, text/event-stream)
+                            ├─► WebSocket Hub  :3001      (ws, instrumentation.ts)
+                            └─► subscribers (radar, hub, judge runner)
+```
+
+### 1. 🩸 AI Token Streaming (SSE typewriter)
+- `POST /api/ai/copilot/stream`, `POST /api/ai/explain/stream`, `POST /api/ai/narrative/stream`
+- Gemini responses stream `{type:"chunk", text}` deltas → the UI renders a live typewriter effect, then `{type:"done", mode, citations}`.
+- `lib/sseStream.ts` is a shared client `postSse(url, body, {onChunk,onDone,onError})` helper used by the Copilot chat, Judge demo, and explain buttons.
+- Deterministic fallbacks keep every stream alive even with no API key.
+
+### 2. 📡 SSE Live Event Feed
+- `GET /api/events/stream` — replays the recent ring buffer, then streams every new event the moment it's recorded (replaces 3s polling in the Live India Network panel, `Component<IndiaLiveNetwork>`).
+- 20s heartbeat comments keep proxies/browsers from closing idle connections.
+
+### 3. 📍 Live Donor Geolocation Radar
+- `POST /api/presence` — donors check in with geolocation (`hazai`-style `donor_registered` event auto-broadcast); `GET /api/presence` lists current presence (90s TTL).
+- The India map plots live donor pins (self = green, others = cyan) with pinging radar rings + a live-donor count chip.
+- "I'm a live donor" button uses the browser Geolocation API to drop you onto the radar.
+
+### 4. ⚙️ WebSocket Realtime Hub
+- A `ws` WebSocketServer binds to port `3001` (from `instrumentation.ts`, configurable via `REALTIME_PORT`).
+- Every client receives: replay history + presence snapshot on connect, live events from the shared bus, a 3s heartbeat tick, and per-peer pong latency.
+- `broadcast` messages fan out to ALL connected tabs/devices for cross-client sync demos; the landing-page `RealtimeHub` widget shows peers, live latency, donor count and a broadcast box.
 
 ---
 
@@ -156,6 +253,8 @@ npx tsx scripts/verify.ts
 
 - **Frontend & Framework:** Next.js 16 (App Router, Turbopack), React 19, TypeScript (Strict Mode)
 - **Voice & NLP Engine:** Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`), Client-Side Natural Language Entity Extractor
+- **Gen-AI & RAG:** Google Gemini 3.5 Flash Lite (generation), Gemini Embedding (embeddings, 3072-d), cosine similarity retrieval, 15-chunk medical knowledge base, deterministic fallback engine, SSE token streaming
+- **Realtime:** Server-Sent Events (`text/event-stream`), WebSocket push hub (`ws`), in-process broadcast bus (SSE + WS fan-out on a shared `globalThis` store)
 - **Styling & UI:** Tailwind CSS, Custom Medical Glassmorphic Theme, Lucide Icons
 - **Database & Auth:** Supabase (PostgreSQL), Role-Based JWT Policies
 - **Mapping & Geolocation:** Leaflet, OpenStreetMap, HTML5 Geolocation API
@@ -175,14 +274,19 @@ cd LifeLine-/lifeline
 # 2. Install dependencies
 npm install
 
-# 3. Run the automated 39-test verification harness
+# 3. Configure environment
+cp .env.local.example .env.local
+# (Optional) Add your free Gemini API key for full LLM/RAG features:
+# Get one at https://aistudio.google.com/apikey
+
+# 4. Run the automated 39-test verification harness
 npx tsx scripts/verify.ts
 
-# 4. Start local development server
+# 5. Start local development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application locally.
+Open [http://localhost:3000](http://localhost:3000) to view the application locally. In production (`npm run build && npm start`) the WebSocket Realtime Hub starts automatically on port `3001` alongside the Next.js server (see `instrumentation.ts`); the AI streaming, SSE feed, and radar features work in both modes.
 
 ---
 

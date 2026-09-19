@@ -16,6 +16,10 @@ import {
 } from "@/lib/services/inventoryService";
 import LanguageToggle from "@/components/LanguageToggle";
 import { useLanguage } from "@/lib/languageContext";
+import ExplainMatchButton from "@/components/ai/ExplainMatchButton";
+import DonorOutreachButton from "@/components/ai/DonorOutreachButton";
+import DeliveryTracker from "@/components/DeliveryTracker";
+import UnitPassport from "@/components/UnitPassport";
 
 /* Dynamically import the map to avoid SSR issues with Leaflet */
 const MatchMap = dynamic(() => import("@/components/MatchMap"), {
@@ -920,6 +924,49 @@ export default function HospitalDashboard() {
                               </div>
                             ))}
                           </div>
+
+                          {/* AI features row */}
+                          {!isReleased && (
+                            <div className="mt-3 flex flex-wrap items-start gap-3 border-t border-ink-5 pt-3">
+                              <ExplainMatchButton
+                                compact
+                                request={{
+                                  id: requestId || "pending",
+                                  hospitalName: hospitalName || "Emergency Trauma Center",
+                                  location: selectedLocation,
+                                  bloodGroup,
+                                  unitsNeeded,
+                                  urgency,
+                                  status: confirmedId ? "confirmed" : "open",
+                                  createdAt: new Date().toISOString(),
+                                }}
+                                match={{
+                                  sourceType: m.sourceType,
+                                  sourceId: m.sourceId,
+                                  sourceName: m.sourceName,
+                                  bloodGroup: m.bloodGroup,
+                                  distanceKm: m.distanceKm,
+                                  score: m.score,
+                                  breakdown: m.breakdown,
+                                  eligibilityNote: m.eligibilityNote,
+                                  location: m.location,
+                                  phone: m.phone,
+                                  totalDonations: m.totalDonations,
+                                  isVerified: m.isVerified,
+                                }}
+                              />
+                              {isDonor && isConfirmed && (
+                                <DonorOutreachButton
+                                  donorName={m.sourceName}
+                                  bloodGroup={m.bloodGroup}
+                                  distanceKm={m.distanceKm}
+                                  urgency={urgency}
+                                  requestId={requestId || "pending"}
+                                  verified={isVerifiedDonor}
+                                />
+                              )}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -930,12 +977,24 @@ export default function HospitalDashboard() {
               {confirmedId && (
                 <div className="mt-5 card-2xl border-green-200 bg-green-50/60 p-5">
                   <p className="font-mono text-xs font-medium uppercase tracking-widest text-green-700">
-                    Match Confirmed & Locked
+                    Match Confirmed & Locked — Rider Dispatched 🛵
                   </p>
                   <p className="mt-1 text-sm text-green-800">
-                    First-confirmed-lock active. All other candidate reserves have been automatically released. The confirmed source has been alerted for immediate dispatch.
+                    First-confirmed-lock active. All other candidates released. Hyperlocal rider dispatched — track live below.
                   </p>
                 </div>
+              )}
+
+              {/* ── Real hyperlocal delivery tracker (no demo wrapper) ── */}
+              {matches && !escalated && (
+                <section className="mt-6">
+                  <DeliveryTracker />
+                </section>
+              )}
+              {matches && !escalated && (
+                <section className="mt-6">
+                  <UnitPassport />
+                </section>
               )}
             </section>
           )}

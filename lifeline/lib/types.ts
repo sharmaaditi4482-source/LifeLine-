@@ -108,10 +108,60 @@ export interface PredictiveShortageRisk {
 
 export interface LiveEvent {
   id: string;
-  type: "request_created" | "match_found" | "match_confirmed" | "stock_updated" | "donor_registered" | "alert_sent" | "donor_verified" | "donation_completed";
+  type: "request_created" | "match_found" | "match_confirmed" | "stock_updated" | "donor_registered" | "alert_sent" | "donor_verified" | "donation_completed" | "delivery_dispatched" | "delivery_pickup" | "delivery_enroute" | "delivery_delivered";
   title: string;
   description: string;
   bloodGroup: BloodGroup;
   locationLabel: string;
   timestamp: string; // ISO string
+}
+
+export type DeliveryStatus = "dispatch" | "pickup" | "en_route" | "delivered";
+
+export interface Delivery {
+  id: string;
+  requestId: string;
+  hospitalName: string;
+  bloodGroup: BloodGroup;
+  sourceType: string;
+  sourceName: string;
+  fromLat: number;
+  fromLng: number;
+  toLat: number;
+  toLng: number;
+  distanceKm: number;
+  etaSecondsReal: number;
+  riderName: string;
+  status: DeliveryStatus;
+  currentLat: number;
+  currentLng: number;
+  progress: number;
+  createdAt: string;
+  deliveredAt?: string;
+}
+
+export type PassportEventType = "collected" | "tested" | "stored" | "dispatched" | "in_transit" | "delivered" | "transfused";
+export interface PassportEvent {
+  type: PassportEventType;
+  title: string;
+  at: string;
+  by: string;
+  tempC?: number;
+  hash: string;
+}
+export interface UnitPassport {
+  id: string;
+  unitId: string;
+  bloodGroup: BloodGroup;
+  donorName: string;
+  donorId: string;
+  sourceName: string;
+  hospitalName: string;
+  collectedAt: string;
+  expiryAt: string;
+  coldChain: number[];
+  events: PassportEvent[];
+  impactLives: number;
+  qr: string;
+  status: "in_stock" | "in_transit" | "delivered" | "transfused";
 }

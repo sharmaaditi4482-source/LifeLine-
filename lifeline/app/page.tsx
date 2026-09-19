@@ -4,12 +4,29 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import LiveFeed from "@/components/LiveFeed";
+import IndiaLiveNetwork from "@/components/IndiaLiveNetwork";
 import HeroNetworkVisual from "@/components/HeroNetworkVisual";
 import SafetyMatrix from "@/components/SafetyMatrix";
 import RoleCards from "@/components/RoleCards";
 import HowItWorks from "@/components/HowItWorks";
 import FeatureGrid from "@/components/FeatureGrid";
 import InteractiveAlgorithmSimulator from "@/components/InteractiveAlgorithmSimulator";
+import dynamic from "next/dynamic";
+import RealtimeHub from "@/components/RealtimeHub";
+import DeliveryTracker from "@/components/DeliveryTracker";
+const AutopilotAgent = dynamic(() => import("@/components/ai/AutopilotAgent"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const CrazyMode = dynamic(() => import("@/components/CrazyMode"), { ssr: false });
+const UnitPassport = dynamic(() => import("@/components/UnitPassport"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const DonorLeaderboard = dynamic(() => import("@/components/DonorLeaderboard"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const AmbulanceTracker = dynamic(() => import("@/components/AmbulanceTracker"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const ShortageHeatmap = dynamic(() => import("@/components/ShortageHeatmap"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const VoiceHindiAgent = dynamic(() => import("@/components/VoiceHindiAgent"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const EvaluationCriteria = dynamic(() => import("@/components/EvaluationCriteria"), { ssr: false });
+const DonorHealthTwin = dynamic(() => import("@/components/DonorHealthTwin"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const BlockchainLedger = dynamic(() => import("@/components/BlockchainLedger"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const DroneFleet = dynamic(() => import("@/components/DroneFleet"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const PulseGlobe = dynamic(() => import("@/components/PulseGlobe"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
+const WhatsAppReal = dynamic(() => import("@/components/WhatsAppReal"), { ssr: false, loading: () => <div className="h-32 rounded-[2rem] border border-ink-10 bg-white animate-pulse" /> });
 import LanguageToggle from "@/components/LanguageToggle";
 import { useLanguage } from "@/lib/languageContext";
 
@@ -251,6 +268,12 @@ export default function Home() {
             <a href="#system-modules" onClick={(e) => handleSmoothScroll(e, "system-modules")} className="hover:text-blood transition-colors">
               {t("nav_about_us")}
             </a>
+            <Link href="/copilot" className="hover:text-blood transition-colors flex items-center gap-1">
+              🤖 AI Copilot
+            </Link>
+            <Link href="/demo" className="hover:text-blood transition-colors flex items-center gap-1">
+              🎬 Live Demo
+            </Link>
           </div>
 
           {/* Right Action Icons */}
@@ -355,7 +378,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-12 space-y-16 sm:space-y-24 relative z-10">
+      <main className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-12 space-y-12 sm:space-y-16 relative z-10 pb-24">
 
         {/* ── 1. HERO SECTION ── */}
         <section className="grid gap-8 lg:grid-cols-[1fr_460px] items-center pt-2 sm:pt-6 page-enter">
@@ -461,6 +484,16 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── 2.5 HYPERLOCAL DELIVERY — PROMINENT ABOVE-THE-FOLD (Blinkit-style) ── */}
+        <section id="delivery" className="reveal-item scroll-mt-24 relative z-20">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-orange-700">Live Golden-Hour Delivery · Blinkit-style for Blood</span>
+            <span className="rounded-full bg-orange-100 border border-orange-200 px-2 py-0.5 font-mono text-[10px] text-orange-700">Real-time</span>
+          </div>
+          <DeliveryTracker />
+        </section>
+
         {/* ── 3. FOUR METRIC STATS CARDS (WITH SPARKLINE CHARTS) ── */}
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 reveal-item">
           {/* Card 1 */}
@@ -550,6 +583,68 @@ export default function Home() {
               <path d="M0 14 Q20 8, 45 15 T75 6 T100 8" stroke="#3B82F6" strokeWidth="2" fill="none" strokeLinecap="round" />
             </svg>
           </div>
+        </section>
+
+        {/* ── 3.5 LIVE INDIA SOS NETWORK ── */}
+        <section className="reveal-item space-y-7">
+          <div className="flex items-end justify-between gap-4 flex-wrap">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/60 border border-red-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-blood" />
+                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-blood">
+                  {language === "hi" ? "लाइव भारत नेटवर्क" : "LIVE INDIA NETWORK"}
+                </span>
+              </div>
+              <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl leading-tight">
+                India's demand-response grid,{" "}
+                <span className="italic font-normal text-blood">beating in real time.</span>
+              </h2>
+            </div>
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 rounded-xl border border-ink-10 bg-white px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-wider text-ink transition hover:border-blood hover:text-blood shadow-sm"
+            >
+              <span className="text-blood">▶</span> Watch the guided demo
+            </Link>
+          </div>
+          <IndiaLiveNetwork />
+        </section>
+
+        {/* ── 3.6 LIVE REALTIME HUB (WebSocket broadcast node) ── */}
+        <section className="reveal-item">
+          <RealtimeHub />
+        </section>
+
+        {/* ── 3.65 SAAS AGENTIC RAG AUTOPILOT ── */}
+        <section className="reveal-item scroll-mt-20">
+          <AutopilotAgent />
+        </section>
+
+        {/* ── 3.66 OUTSTANDING: BLOOD UNIT PASSPORT — COLD-CHAIN TRACEABILITY ── */}
+        <section id="passport" className="reveal-item scroll-mt-20">
+          <UnitPassport />
+        </section>
+
+        {/* ── 3.7 OUTSTANDING GRID: AMBULANCE + HEATMAP + VOICE + LEADERBOARD ── */}
+        <section className="reveal-item grid gap-6 lg:grid-cols-2">
+          <AmbulanceTracker />
+          <ShortageHeatmap />
+          <VoiceHindiAgent />
+          <DonorLeaderboard />
+        </section>
+
+        {/* ── 3.75 NEXT-GEN CRAZY GRID: HEALTH TWIN + BLOCKCHAIN + DRONE + GLOBE + WHATSAPP ── */}
+        <section className="reveal-item grid gap-6 lg:grid-cols-2">
+          <DonorHealthTwin />
+          <BlockchainLedger />
+          <DroneFleet />
+          <PulseGlobe />
+          <div className="lg:col-span-2"><WhatsAppReal /></div>
+        </section>
+
+        {/* ── 3.8 EVALUATION CRITERIA — OUTSTANDING COVERAGE ── */}
+        <section className="reveal-item">
+          <EvaluationCriteria />
         </section>
 
         {/* ── 4. SYSTEM MODULES (HORIZONTALLY SLEEK) ── */}
@@ -750,6 +845,8 @@ export default function Home() {
         </section>
 
       </main>
+
+      <CrazyMode />
 
       {/* ── HIGH VISIBILITY FLOATING EMERGENCY SOS WIDGET ── */}
       <aside aria-label="Emergency SOS" className="fixed bottom-6 right-6 z-50">

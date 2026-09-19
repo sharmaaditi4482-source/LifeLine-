@@ -5,6 +5,9 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { BloodGroup, MatchResult, Location } from "@/lib/types";
 import { resolveLocation } from "@/lib/store";
+import ExplainMatchButton from "@/components/ai/ExplainMatchButton";
+import DonorOutreachButton from "@/components/ai/DonorOutreachButton";
+import SosSummaryCard from "@/components/ai/SosSummaryCard";
 
 const MatchMap = dynamic(() => import("@/components/MatchMap"), {
   ssr: false,
@@ -850,6 +853,49 @@ export default function EmergencyPage() {
                             </div>
                           ))}
                         </div>
+
+                        {/* AI features row */}
+                        {!isReleased && (
+                          <div className="mt-3 flex flex-wrap items-start gap-3 border-t border-ink-5 pt-3">
+                            <ExplainMatchButton
+                              compact
+                              request={{
+                                id: requestId || "pending",
+                                hospitalName: `Emergency — ${contactName || "Anonymous"}`,
+                                location: selectedLocation,
+                                bloodGroup,
+                                unitsNeeded,
+                                urgency: "critical" as const,
+                                status: confirmedId ? "confirmed" : "open",
+                                createdAt: new Date().toISOString(),
+                              }}
+                              match={{
+                                sourceType: m.sourceType,
+                                sourceId: m.sourceId,
+                                sourceName: m.sourceName,
+                                bloodGroup: m.bloodGroup,
+                                distanceKm: m.distanceKm,
+                                score: m.score,
+                                breakdown: m.breakdown,
+                                eligibilityNote: m.eligibilityNote,
+                                location: m.location,
+                                phone: m.phone,
+                                totalDonations: m.totalDonations,
+                                isVerified: m.isVerified,
+                              }}
+                            />
+                            {m.sourceType === "donor" && isConfirmed && (
+                              <DonorOutreachButton
+                                donorName={m.sourceName}
+                                bloodGroup={m.bloodGroup}
+                                distanceKm={m.distanceKm}
+                                urgency="critical"
+                                requestId={requestId || "pending"}
+                                verified={m.isVerified}
+                              />
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -869,6 +915,20 @@ export default function EmergencyPage() {
                   {contactPhone && <span className="block mt-1 font-mono text-xs">Callback: {contactPhone}</span>}
                 </p>
               </div>
+            )}
+
+            {/* Gen-AI Emergency Summary */}
+            {confirmedId && (
+              <SosSummaryCard
+                hospitalName={`Emergency — ${contactName || "Anonymous"}`}
+                bloodGroup={bloodGroup}
+                unitsNeeded={unitsNeeded}
+                urgency="critical"
+                locationLabel={selectedLocation.label}
+                topSourceName={matches?.[0]?.sourceName}
+                topScore={matches?.[0]?.score}
+                contactName={contactName || undefined}
+              />
             )}
           </section>
         )}
