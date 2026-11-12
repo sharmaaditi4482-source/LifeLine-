@@ -6,69 +6,62 @@ import { recordLiveEvent } from "@/lib/services/eventService";
 
 /**
  * POST /api/match
- * 
- * Takes hospital request parameters, records the request, runs the multi-factor
- * ABO/Rh safe matching engine against verified live database donors and hospital reserves,
- * records a live event, and returns the sorted matches with score breakdown.
+ * Runs the deterministic ABO/Rh-safe matching engine and returns a transparent
+ * workflow trace. This is decision support only; it is not clinical approval.
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { hospitalName, bloodGroup, unitsNeeded, urgency, location } = body;
 
-    if (!bloodGroup || !unitsNeeded || !urgency || !location) {
+    const validBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+    const validUrgencies = ["critical", "high", "medium"];
+    const lat = Number(location?.lat);
+    const lng = Number(location?.lng);
+    const units = Number(unitsNeeded);
+
+    if (
+      !validBloodGroups.includes(bloodGroup) ||
+      !validUrgencies.includes(urgency) ||
+      !Number.isInteger(units) || units < 1 || units > 100 ||
+      !Number.isFinite(lat) || lat < -90 || lat > 90 ||
+      !Number.isFinite(lng) || lng < -180 || lng > 180
+    ) {
       return NextResponse.json(
-        { error: "Missing required fields: bloodGroup, unitsNeeded, urgency, location." },
+        { error: "Provide a valid blood group, urgency, positive unit count (maximum 100), and location coordinates." },
         { status: 400 }
       );
     }
 
-    // Resolve accurate coordinates from city / facility label
-    const resolvedLocation = await resolveLocation(location.label || hospitalName, location);
-
-    // Dynamically ensure authentic local hospitals & donors exist for searched city
+    const resolvedLocation = await resolveLocation(location.label || hospitalName, { ...location, lat, lng });
     await ensureLocalFacilitiesForLocation(resolvedLocation);
 
     const newRequest: BloodRequest = {
       id: `req_${Date.now()}`,
-      hospitalName: hospitalName || "Emergency Trauma Desk",
+      hospitalName: typeof hospitalName === "string" && hospitalName.trim() ? hospitalName.trim().slice(0, 120) : "Emergency Trauma Desk",
       bloodGroup,
-      unitsNeeded: Number(unitsNeeded),
+      unitsNeeded: units,
       urgency,
       location: resolvedLocation,
       status: "open",
       createdAt: new Date().toISOString(),
     };
 
-    // 1. Fetch real candidate donors & bank inventory units from database
-    const dbDonors = await getDonors();
-    const dbBankUnits = await getBankUnits();
-
-    // 2. Persist request
+    const [dbDonors, dbBankUnits] = await Promise.all([getDonors(), getBankUnits()]);
     await addRequest(newRequest);
 
-    // 3. Evaluate real candidates through matching engine
-    const allMatches = matchRequest(newRequest, {
-      donors: dbDonors,
-      bankUnits: dbBankUnits,
-    });
-
-    // Tier 1: Local candidates within emergency transit radius (< 60 km)
-    let matches = allMatches.filter((m) => m.distanceKm <= 60);
-    
-    // Tier 2: If fewer than 2 candidates, escalate to district/regional radius (< 150 km)
+    const allMatches = matchRequest(newRequest, { donors: dbDonors, bankUnits: dbBankUnits });
+    let matches = allMatches.filter((match) => match.distanceKm <= 60);
+    let searchRadiusKm = 60;
     if (matches.length < 2) {
-      matches = allMatches.filter((m) => m.distanceKm <= 150);
+      matches = allMatches.filter((match) => match.distanceKm <= 150);
+      searchRadiusKm = 150;
     }
-    
-    // Tier 3: National escalation fallback if completely empty
     if (matches.length === 0) {
       matches = allMatches;
+      searchRadiusKm = null;
     }
 
-    const escalated = matches.length === 0;
-
-    // 4. Record live event for real-time dashboards & landing page feed
     recordLiveEvent({
       type: "request_created",
       title: `${newRequest.urgency.toUpperCase()} ${bloodGroup} Request Raised`,
@@ -91,9 +84,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       request: newRequest,
       matches,
-      escalated,
+      escalated: matches.length === 0,
+      workflow: [
+        { step: "intake", status: "complete", detail: "Request fields and coordinates validated." },
+        { step: "eligibility_and_compatibility", status: "complete", detail: "Deterministic matching engine applied donor eligibility, availability, ABO/Rh, stock, and expiry filters." },
+        { step: "candidate_ranking", status: "complete", detail: `Ranked ${matches.length} candidate(s) within the ${searchRadiusKm === null ? "available national" : `${searchRadiusKm} km`} search scope.` },
+        { step: "human_review", status: "required", detail: "A qualified hospital operator must verify the recommendation before any clinical or dispatch action." },
+      ],
+      decisionSupportOnly: true,
     });
-  } catch (err) {
+  } catch {
     return NextResponse.json(
       { error: "Something went wrong processing the matching request." },
       { status: 500 }
